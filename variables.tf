@@ -1,0 +1,11 @@
+variable "proxmox_api_endpoint" {
+  description = "Proxmox API endpoint; e.g.: https://pve.domain.net:8006"
+  type = string
+}
+
+variable "proxmox_api_token" {
+  description = "Proxmox API token; e.g.: USER@pve!provider=TOKEN"
+  sensitive = true
+  type = string
+}
+

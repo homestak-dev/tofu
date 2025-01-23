@@ -1,0 +1,13 @@
+**/*.swp
+
+# https://spacelift.io/blog/terraform-gitignore
+**/.terraform/*
+*.auto.tfvars
+*.tfoverride
+.envrc
+.terraformrc
+.terraform.lock.hcl
+terraform.rc
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.backup
