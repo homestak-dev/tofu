@@ -50,9 +50,6 @@ resource "proxmox_virtual_environment_vm" "this" {
   agent {
     enabled = true
   }
-  audio_device {
-    enabled = false
-  }
   cpu {
     cores = 2
     type = "host"
