@@ -28,13 +28,9 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
       timezone: "America/Denver"
       packages:
         - qemu-guest-agent
-      runcmd:
-        - apt update
-        - apt upgrade -y
-        - reboot now
 
       EOF
-    file_name  = "meta-data.yaml"
+    file_name  = "meta-data.${var.vm_hostname}.yaml"
   }
 }
 
@@ -44,7 +40,8 @@ resource "proxmox_virtual_environment_file" "cloud_init_user" {
   datastore_id = "local"
   node_name    = var.proxmox_node_name
   source_file {
-    path       = "${path.module}/cloud-config.yaml"
+    path       = "${path.module}/user-data.yaml"
+    file_name  = "user-data.${var.vm_hostname}.yaml"
   }
 }
 
