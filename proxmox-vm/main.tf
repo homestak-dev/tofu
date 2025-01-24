@@ -7,15 +7,6 @@ terraform {
   }
 }
 
-# https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_download_file.md
-resource "proxmox_virtual_environment_download_file" "cloud_image" {
-  content_type = "iso"
-  datastore_id = "local"
-  node_name    = var.proxmox_node_name
-  url          = var.source_file_url
-  overwrite    = false
-}
-
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_file.md
 resource "proxmox_virtual_environment_file" "cloud_init_meta" {
   content_type = "snippets"
@@ -58,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     datastore_id = "local-zfs"
     discard      = "on"
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.cloud_image.id
+    file_id      = var.cloud_image_id
     interface    = "virtio0"
     iothread     = true
     size         = 10
@@ -79,11 +70,13 @@ resource "proxmox_virtual_environment_vm" "this" {
     user_data_file_id = proxmox_virtual_environment_file.cloud_init_user.id
   }
   lifecycle {
-    ignore_changes = [ ]
+    ignore_changes = [
+      tags
+    ]
   }
   memory {
-    dedicated = 2048
-    floating  = 2048
+    dedicated = 4096  # maximum allocated
+    floating  = 2048  # minimum allocated
   }
   name        = var.vm_name
   network_device {

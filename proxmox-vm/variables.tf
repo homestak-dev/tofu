@@ -4,21 +4,8 @@ variable "proxmox_node_name" {
   type = string
 }
 
-variable "source_file_path" {
-  description = "local path to cloud image (not .iso)"
-  default = "noble-server-cloudimg-amd64.img"
-  type = string
-}
-
-variable "source_file_url" {
-  description = "remote url to cloud image (not .iso)"
-  default = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
-  type = string
-}
-
-variable "source_file_checksum" {
-  description = "SHA-256 checksum for cloud image file"
-  default = "63f5e103195545a429aec2bf38330e28ab9c6d487e66b7c4b0060aa327983628"
+variable "cloud_image_id" {
+  description = ""
   type = string
 }
 
@@ -34,7 +21,7 @@ variable "vm_hostname" {
 
 variable "vm_tags" {
   description = "list of tags for the virtual machine; e.g.: [\"dev\",\"ubuntu\"]"
-  default = [ ]
+  default = null
   type = list(string)
 }
 
@@ -46,7 +33,7 @@ variable "vm_dns_domain" {
 
 variable "vm_dns_servers" {
   description = "list of dns server(s) for the virtual machine; e.g.: [\"10.0.12.1\"]"
-  default = [ ]
+  default = null
   type = list(string)
 }
 
