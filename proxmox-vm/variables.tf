@@ -25,6 +25,12 @@ variable "vm_tags" {
   type = list(string)
 }
 
+variable "vm_bridge" {
+  description = "bridge interface for the virtual machine; e.g.: jderose.net"
+  default = "vmbr0"
+  type = string
+}
+
 variable "vm_dns_domain" {
   description = "dns search domain for the virtual machine; e.g.: jderose.net"
   default = null
