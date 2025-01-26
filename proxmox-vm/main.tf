@@ -80,7 +80,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
   name        = var.vm_name
   network_device {
-    bridge  = "vmbr0"
+    bridge  = var.vm_bridge
     vlan_id = var.vm_vlan_id
   }
   node_name   = var.proxmox_node_name
