@@ -19,7 +19,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
       timezone: "America/Denver"
       packages:
         - qemu-guest-agent
-
+      ${join("\n", formatlist("  - %s", var.vm_packages))}
       EOF
     file_name  = "meta-data.${var.vm_hostname}.yaml"
   }

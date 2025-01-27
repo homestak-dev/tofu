@@ -55,9 +55,14 @@ variable "vm_ipv4_gateway" {
   type = string
 }
 
+variable "vm_packages" {
+  description = "optional packages for the virtual machine; e.g., [\"curl\",\"git\"]"
+  default = [ ]
+  type = list(string)
+}
+
 variable "vm_vlan_id" {
   description = "vlan id for the virtual machine (omit for untagged); e.g.: 12"
   default = null
   type = string
 }
-
