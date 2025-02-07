@@ -7,6 +7,7 @@
 .envrc
 .terraformrc
 .terraform.lock.hcl
+.terraform.tfstate.lock.info
 terraform.rc
 terraform.tfvars
 terraform.tfstate
