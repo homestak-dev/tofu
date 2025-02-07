@@ -10,11 +10,11 @@ terraform {
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_download_file.md
 resource "proxmox_virtual_environment_download_file" "this" {
   content_type       = "iso"
-  datastore_id       = "local"
+  datastore_id       = "cephfs"
   node_name          = var.proxmox_node_name
   url                = var.source_file_url
   checksum           = var.source_file_checksum_val
   checksum_algorithm = var.source_file_checksum_algo
-  overwrite          = true
+  overwrite_unmanaged= true
 }
 
