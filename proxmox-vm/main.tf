@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     proxmox = {
-      source = "bpg/proxmox"
+      source  = "bpg/proxmox"
       version = "0.70.0"
     }
   }
@@ -21,7 +21,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
         - qemu-guest-agent
       ${join("\n", formatlist("  - %s", var.vm_packages))}
       EOF
-    file_name  = "meta-data.${var.vm_hostname}.yaml"
+    file_name = "meta-data.${var.vm_hostname}.yaml"
   }
 }
 
@@ -44,7 +44,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   cpu {
     cores = 2
     flags = [ ]
-    type = "x86-64-v2-AES"
+    type  = "x86-64-v2-AES"
   }
   disk {
     datastore_id = "pool1"
@@ -79,21 +79,24 @@ resource "proxmox_virtual_environment_vm" "this" {
     dedicated = 4096  # maximum allocated
     floating  = 2048  # minimum allocated
   }
-  name        = var.vm_name
+  name = var.vm_name
   network_device {
-    bridge  = var.vm_bridge
-    vlan_id = var.vm_vlan_id
+    bridge      = var.vm_bridge
+    mac_address = var.vm_mac_address
+    vlan_id     = var.vm_vlan_id
   }
-  node_name   = var.proxmox_node_name
+  node_name = var.proxmox_node_name
   operating_system {
     type = "l26"
   }
+  reboot = true
   startup {
     order      = "3"
     up_delay   = "10"
     down_delay = "10"
   }
-  tags        = var.vm_tags
+  tags  = var.vm_tags
+  vm_id = var.vm_id
 }
 
 resource "tls_private_key" "this" {
