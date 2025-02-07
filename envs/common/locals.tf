@@ -1,8 +1,3 @@
-  # the nodes data structure "flattens" the sparse cluster_data (defined
-  # in each of the environment-specific locals.tf file) and provides an 
-  # inheritance mechanism for defining values at the default, cluster,
-  # and node levels.
-
 locals {
   default_settings = {
     proxmox_node_name = "pve1"
@@ -14,6 +9,11 @@ locals {
     dns_domain        = "local"
     dns_servers       = ["8.8.8.8", "1.1.1.1"]
   }
+
+  # the nodes data structure "flattens" the sparse cluster_data (defined
+  # in each of the environment-specific locals.tf file) and provides an 
+  # inheritance mechanism for defining values at the default, cluster,
+  # and node levels. credit/blame goes to ChatGPT.
 
   nodes = {
     for node in flatten([
