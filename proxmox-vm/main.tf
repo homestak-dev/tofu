@@ -10,7 +10,7 @@ terraform {
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_file.md
 resource "proxmox_virtual_environment_file" "cloud_init_meta" {
   content_type = "snippets"
-  datastore_id = "local"
+  datastore_id = "cephfs"
   node_name    = var.proxmox_node_name
   source_raw {
     data = <<-EOF
@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
 # Snippets are not enabled by default in new Proxmox installations.
 resource "proxmox_virtual_environment_file" "cloud_init_user" {
   content_type = "snippets"
-  datastore_id = "local"
+  datastore_id = "cephfs"
   node_name    = var.proxmox_node_name
   source_file {
     path       = "${path.module}/user-data.yaml"
@@ -43,10 +43,11 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
   cpu {
     cores = 2
-    type = "host"
+    flags = [ ]
+    type = "x86-64-v2-AES"
   }
   disk {
-    datastore_id = "local-zfs"
+    datastore_id = "pool1"
     discard      = "on"
     file_format  = "raw"
     file_id      = var.cloud_image_id
@@ -55,7 +56,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     size         = 10
   }
   initialization {
-    datastore_id = "local-zfs"
+    datastore_id = "pool1"
     dns {
       domain  = var.vm_dns_domain
       servers = var.vm_dns_servers
@@ -99,4 +100,3 @@ resource "tls_private_key" "this" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
-
