@@ -2,7 +2,7 @@ locals {
 
   defaults = {
     proxmox_node_name = null              # explicitly set per cluster or node
-    bridge            = "main"
+    bridge            = "vnet10"
     dns_domain        = "main"
     dns_servers       = ["10.10.10.10"]
     ipv4_gateway      = "10.10.10.1"
