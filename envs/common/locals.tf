@@ -3,7 +3,7 @@ locals {
     proxmox_node_name = "pve1"
     bridge            = "vmbr0"
     packages          = []
-    mac_address       = "00:00:00:00:00:00"
+    mac_address       = null
     ipv4_address      = "dhcp"
     ipv4_gateway      = "10.10.10.1"
     dns_domain        = "local"
