@@ -20,6 +20,8 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
       packages:
         - qemu-guest-agent
       ${join("\n", formatlist("  - %s", var.vm_packages))}
+      package_update: false
+      package_upgrade: false
       EOF
     file_name = "meta-data.${var.vm_hostname}.yaml"
   }
@@ -39,7 +41,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_user" {
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_vm.md
 resource "proxmox_virtual_environment_vm" "this" {
   agent {
-    enabled = true
+    enabled = false
   }
   cpu {
     cores = 2
@@ -89,12 +91,14 @@ resource "proxmox_virtual_environment_vm" "this" {
   operating_system {
     type = "l26"
   }
-  reboot = true
+  reboot  = false
+  started = false
   startup {
     order      = "3"
     up_delay   = "10"
     down_delay = "10"
   }
+  stop_on_destroy = true
   tags  = var.vm_tags
   vm_id = var.vm_id
 }
