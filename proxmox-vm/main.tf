@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     type  = "x86-64-v2-AES"
   }
   disk {
-    datastore_id = "pool1"
+    datastore_id = "cephpool1"
     discard      = "on"
     file_format  = "raw"
     file_id      = var.cloud_image_id
@@ -58,7 +58,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     size         = 10
   }
   initialization {
-    datastore_id = "pool1"
+    datastore_id = "cephpool1"
     dns {
       domain  = var.vm_dns_domain
       servers = var.vm_dns_servers
@@ -85,6 +85,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   network_device {
     bridge      = var.vm_bridge
     mac_address = var.vm_mac_address
+    mtu         = 1
     vlan_id     = var.vm_vlan_id
   }
   node_name = var.proxmox_node_name
