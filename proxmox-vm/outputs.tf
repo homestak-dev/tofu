@@ -1,7 +1,15 @@
-output "vm_public_key" {
-  value = tls_private_key.this.public_key_openssh
+output "vm_id" {
+  value = proxmox_virtual_environment_vm.this.vm_id
 }
 
-output "vm_network_device" {
-  value = proxmox_virtual_environment_vm.this.network_device
+output "vm_name" {
+  value = proxmox_virtual_environment_vm.this.name
+}
+
+output "vm_ipv4_addresses" {
+  value = proxmox_virtual_environment_vm.this.ipv4_addresses
+}
+
+output "vm_mac_addresses" {
+  value = proxmox_virtual_environment_vm.this.mac_addresses
 }
