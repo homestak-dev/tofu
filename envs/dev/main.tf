@@ -4,6 +4,10 @@ terraform {
       source  = "bpg/proxmox"
       version = "0.90.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.0.0"
+    }
   }
 }
 
@@ -125,7 +129,7 @@ module "router" {
   proxmox_node_name = var.proxmox_node_name
   vm_id             = 10000
   vm_name           = "router"
-  vm_started        = true
+  vm_started        = false  # Started by boot_sequence below
   vm_startup_order  = 1
 
   network_devices = [
@@ -158,5 +162,30 @@ module "vm" {
   vm_dns_domain   = each.value.dns_domain
   vm_dns_servers  = each.value.dns_servers
 
-  depends_on = [module.sdn, module.router]
+  depends_on = [module.sdn]  # No router dependency - parallel provisioning
+}
+
+# Boot VMs in sequence after parallel provisioning
+resource "null_resource" "boot_sequence" {
+  # Re-run if any VM is recreated
+  triggers = {
+    router_id = module.router.vm_id
+    vm_ids    = join(",", [for k, v in module.vm : v.vm_id])
+  }
+
+  # Start router first, wait for it, then start other VMs
+  provisioner "local-exec" {
+    command = <<-EOT
+      echo "Starting router..."
+      qm start 10000
+      echo "Waiting for router to be ready..."
+      sleep 30
+      echo "Starting dev VMs..."
+      %{for k, v in module.vm~}
+      qm start ${v.vm_id}
+      %{endfor~}
+    EOT
+  }
+
+  depends_on = [module.router, module.vm]
 }
