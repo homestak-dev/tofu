@@ -16,7 +16,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_user" {
 
   source_raw {
     data      = var.cloud_init_user_data
-    file_name = "${var.vm_name}-user.yaml"
+    file_name = "${var.vm_name}.user.yaml"
   }
 }
 
@@ -30,7 +30,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_network" {
 
   source_raw {
     data      = var.cloud_init_network_data
-    file_name = "${var.vm_name}-network.yaml"
+    file_name = "${var.vm_name}.network.yaml"
   }
 }
 
