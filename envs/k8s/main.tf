@@ -32,7 +32,7 @@ EOF
           ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
         sudo: ALL=(ALL) NOPASSWD:ALL
 
-    package_update: true
+    package_update: false
     packages:
       - qemu-guest-agent
 
@@ -63,7 +63,7 @@ EOF
           ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
         sudo: ALL=(ALL) NOPASSWD:ALL
 
-    package_update: true
+    package_update: false
     packages:
       - qemu-guest-agent
       - iptables-persistent
