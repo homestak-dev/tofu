@@ -71,9 +71,8 @@ variable "network_devices" {
 
 # Cloud-init configuration
 variable "cloud_init_user_data" {
-  description = "Cloud-init user-data (YAML string). If not provided, uses default."
+  description = "Cloud-init user-data (YAML string)"
   type        = string
-  default     = null
 }
 
 variable "cloud_init_network_data" {

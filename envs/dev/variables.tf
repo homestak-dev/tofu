@@ -10,6 +10,12 @@ variable "proxmox_api_endpoint" {
 
 variable "proxmox_api_token" {
   description = "Proxmox API token; e.g.: USER@pve!provider=TOKEN"
-  sensitive = true
-  type = string
+  sensitive   = true
+  type        = string
+}
+
+variable "root_password_hash" {
+  description = "Hashed root password for VMs (generate with: mkpasswd -m sha-512)"
+  sensitive   = true
+  type        = string
 }

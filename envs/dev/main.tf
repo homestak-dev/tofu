@@ -8,6 +8,32 @@ terraform {
 }
 
 locals {
+  # Base cloud-init for all VMs (uses shared SSH keys from common module)
+  base_user_data = <<-EOF
+    #cloud-config
+    users:
+      - name: root
+        lock_passwd: false
+        hashed_passwd: ${var.root_password_hash}
+        ssh_authorized_keys:
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+      - name: jderose
+        groups: sudo
+        shell: /bin/bash
+        ssh_authorized_keys:
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
+        sudo: ALL=(ALL) NOPASSWD:ALL
+
+    package_update: true
+    packages:
+      - qemu-guest-agent
+
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
+  EOF
+
+  # Router-specific cloud-init
   router_user_data = <<-EOF
     #cloud-config
     hostname: router
@@ -16,14 +42,14 @@ locals {
     users:
       - name: root
         lock_passwd: false
-        hashed_passwd: $6$rounds=500000$uCCa0piztTDbgiIJ$8ekZqACZr9iACDdbW5eCgIQVHOETlTTu/RkIBf.7nsHfJgop30M8c/tAXbzqz.cJfGxF8cLiXYzGKeu65ZUCg.
+        hashed_passwd: ${var.root_password_hash}
         ssh_authorized_keys:
-          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCqZRMXskxuD1sVvspZ3Ut97vcGbQxmfDGnZu3AOjgK2VBdQZAzc9R0pvrhZiS26rM4pg54yNdyzgV9dgxRB9FUzgkW87GcjG3EcODo9vFqhsDp3628JiIQXw78vISMZtVcArGhVgjA9qfw3YnZscdOp735HeG2RyglhumPDkFgs6g3FhqQ+e+W8t0LT3+CyWtSMQwy3VSQi+VhUfueLuuxSjbi9FDEpse550ZldwKJjgloaXfs95MWjV4gs7xVnHlNnSNUvbxKntmRWoM8c3jD8zOsgQHFNDtHRT7xIt7OteIhhg2tRPdDFXfihnt/2ij9kwttD/UGhTDe7wCSrln1uaQZsUjeSlMyihQ7dvjlz8IqZNHMz8XaaPFroxIsTyh4A9njhym28BJ7VMlwsM8VwloPBKPf/MoQ6VyejXHyQ9ScqHkiOlXEUX/CPxOUL1Q0voeZGyYw4tLErGuG/GdeyIl1S8nRh7F/eR2uj9zYmhAYx3MtLzqAm0K2DT+9v6n2kWg3biJQXLUxL2rTEeBIF5jgX0+CWRDrZ6MIwXws3/9AdkxPR6QIubWWIPbpBI0m4/vB7R9+2C7Xge1cZFIxCedpx4IY5Y9x2vsqeMM56Iw8IGyt9Sm1yN0cdrtCThnKA0SCVUzbTsqjF8ifzN+yOdbtZxRtHR8msdLx6rk/tQ== root@pve"
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
       - name: jderose
         groups: sudo
         shell: /bin/bash
         ssh_authorized_keys:
-          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCnvGantA04mFEdsK0QbTP1b8w8GFKUf3lTgfQ7y0U6cOt5iHWi8a6eF3QXregEc425mCum9zmlFV0z8NOBPhvn0keSdmI868lH0gfcUy8tKaP+xKRQ+EARAtmKmshb2VI2nhJy0N+af+vWqMk8ecGC8SmLQrITuN1oR/xH4arWV6r3H9qYh2pt6nNxSGKUw7BydGDQTr2fFDe+c19RgnATIyDl2AAcTrIKuQFjXJ3nTCbJRMZ/d93ldfMmRUdKd1FI5z4rrxr20/yeXDPFQmShKqb1HtoGarcXgK2aZ8OfbzI+AKgrErVtxLJ5xIu5Hch68WNeQzN7wxBJEz1mBVJJBn2ItICdh9gnzgJeWKwSDSkJyMDT3tEhRYyCuYlqn/TTTI8IRgj3PyHTJ3bdQD99E2hMMYOCjWErwh2+CdDVi9FTUKXSljpTcYxKvDjgvSsdmGqWo6I+JFNxhwa44UoV/j44A6Z6wvHrmoNpZbN3YmFn6Br0EvAp7r5bwWt6S8c= jderose"
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
         sudo: ALL=(ALL) NOPASSWD:ALL
 
     package_update: true
@@ -124,6 +150,8 @@ module "vm" {
   vm_name           = each.value.hostname
 
   network_devices = [{ bridge = module.sdn.vnet_id }]
+
+  cloud_init_user_data = local.base_user_data
 
   vm_ipv4_address = each.value.ipv4_address
   vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : module.sdn.gateway
