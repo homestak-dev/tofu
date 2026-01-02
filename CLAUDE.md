@@ -34,11 +34,11 @@ tofu/
 /root/
 ├── tofu/             # This project - VM provisioning
 ├── proxmox-setup/    # Ansible playbooks for PVE configuration
-└── packer-images/    # Custom cloud images with pre-installed packages
+└── packer/           # Custom cloud images with pre-installed packages
 ```
 
 - **proxmox-setup**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
-- **packer-images**: Builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
+- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
 
 ## Key Technologies
 
