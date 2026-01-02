@@ -12,10 +12,18 @@ terraform {
 }
 
 locals {
-  # Base cloud-init for all VMs (uses shared SSH keys from common module)
-  base_user_data = <<-EOF
+  # Base cloud-init template - generates per-VM config with hostname
+  vm_user_data = { for k, v in module.common.nodes : k => <<-EOF
     #cloud-config
+    hostname: ${v.hostname}
+    fqdn: ${v.hostname}.${v.dns_domain}
+
     users:
+EOF
+  }
+
+  # Shared user/package config (appended to each VM's cloud-init)
+  base_user_data_suffix = <<-EOF
       - name: root
         lock_passwd: false
         hashed_passwd: ${var.root_password_hash}
@@ -35,7 +43,10 @@ locals {
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-  EOF
+EOF
+
+  # Combined per-VM cloud-init (hostname + base config)
+  base_user_data = { for k, v in local.vm_user_data : k => "${v}${local.base_user_data_suffix}" }
 
   # Router-specific cloud-init
   router_user_data = <<-EOF
@@ -155,7 +166,7 @@ module "vm" {
 
   network_devices = [{ bridge = module.sdn.vnet_id }]
 
-  cloud_init_user_data = local.base_user_data
+  cloud_init_user_data = local.base_user_data[each.key]
 
   vm_ipv4_address = each.value.ipv4_address
   vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : module.sdn.gateway
