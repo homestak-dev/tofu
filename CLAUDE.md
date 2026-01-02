@@ -24,6 +24,7 @@ tofu/
     ├── common/       # Shared logic (node inheritance/merging)
     ├── dev/          # Development environment (SDN + router)
     ├── k8s/          # Kubernetes environment (dual SDN networks)
+    ├── pve-test/     # Debian 13 VM for testing pve-install playbook
     └── test/         # Single test VM (toggle-enabled)
 ```
 
@@ -32,10 +33,12 @@ tofu/
 ```
 /root/
 ├── tofu/             # This project - VM provisioning
+├── proxmox-setup/    # Ansible playbooks for PVE configuration
 └── packer-images/    # Custom cloud images with pre-installed packages
 ```
 
-The `packer-images` project builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
+- **proxmox-setup**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
+- **packer-images**: Builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
 
 ## Key Technologies
 
@@ -43,7 +46,7 @@ The `packer-images` project builds custom Debian cloud images with qemu-guest-ag
 - **bpg/proxmox provider v0.90.0** - Proxmox VE integration
 - **Cloud-Init** - VM initialization
 - **local-zfs** - Storage backend
-- **Debian 12 Cloud Images** - VM base (Bookworm)
+- **Debian Cloud Images** - VM base (Bookworm 12, Trixie 13)
 - **VXLAN SDN** - Software-defined networking for VM isolation
 
 ## Architecture
