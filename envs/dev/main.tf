@@ -145,6 +145,7 @@ module "router" {
   proxmox_node_name = var.proxmox_node_name
   vm_id             = 10000
   vm_name           = "router"
+  vm_memory         = 1024
   vm_started        = false  # Started by boot_sequence below
   vm_startup_order  = 1
 
