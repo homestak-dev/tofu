@@ -132,6 +132,11 @@ module "sdn_prod" {
   vxlan_tag      = 201
 }
 
+# Final SDN applier - ensures config is applied after all SDN resources on destroy
+resource "proxmox_virtual_environment_sdn_applier" "this" {
+  depends_on = [module.sdn_mgmt, module.sdn_prod]
+}
+
 # Router VM - gateway for k8smgmt and k8sprod networks
 module "router" {
   source = "../../proxmox-vm"

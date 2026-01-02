@@ -120,6 +120,11 @@ module "sdn" {
   subnet_gateway = "10.10.10.1"
 }
 
+# Final SDN applier - ensures config is applied after all SDN resources on destroy
+resource "proxmox_virtual_environment_sdn_applier" "this" {
+  depends_on = [module.sdn]
+}
+
 module "common" {
   source   = "../common"
   clusters = local.clusters
