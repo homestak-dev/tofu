@@ -29,3 +29,9 @@ variable "mtu" {
   default     = 1450
 }
 
+variable "vxlan_tag" {
+  description = "VXLAN Network Identifier (VNID) - unique tag for this virtual network"
+  type        = number
+  default     = 100
+}
+

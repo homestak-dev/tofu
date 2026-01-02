@@ -18,6 +18,7 @@ resource "proxmox_virtual_environment_sdn_zone_vxlan" "this" {
 resource "proxmox_virtual_environment_sdn_vnet" "this" {
   id   = var.vnet_id
   zone = proxmox_virtual_environment_sdn_zone_vxlan.this.id
+  tag  = var.vxlan_tag
 }
 
 # Subnet - IP addressing for the VNet

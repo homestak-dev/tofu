@@ -13,6 +13,7 @@ resource "proxmox_virtual_environment_download_file" "this" {
   datastore_id       = "local"
   node_name          = var.proxmox_node_name
   url                = var.source_file_url
+  file_name          = var.source_file_path
   checksum           = var.source_file_checksum_val
   checksum_algorithm = var.source_file_checksum_algo
   overwrite_unmanaged= true
