@@ -20,13 +20,22 @@ tofu/
 ├── proxmox-vm/       # Reusable module: single VM provisioning
 ├── proxmox-file/     # Reusable module: cloud image management
 ├── proxmox-sdn/      # Reusable module: VXLAN SDN networking
-├── envs/
-│   ├── common/       # Shared logic (node inheritance/merging)
-│   ├── dev/          # Development environment
-│   └── prod/         # Production environment
-├── cluster/          # Multi-VM cluster orchestration
-└── test/             # Single test VM
+└── envs/
+    ├── common/       # Shared logic (node inheritance/merging)
+    ├── dev/          # Development environment (SDN + router)
+    ├── k8s/          # Kubernetes environment (dual SDN networks)
+    └── test/         # Single test VM (toggle-enabled)
 ```
+
+## Related Projects
+
+```
+/root/
+├── tofu/             # This project - VM provisioning
+└── packer-images/    # Custom cloud images with pre-installed packages
+```
+
+The `packer-images` project builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
 
 ## Key Technologies
 
@@ -55,8 +64,7 @@ Node configuration flows through a merge hierarchy in `envs/common/locals.tf`:
 | `proxmox-file` | Download and manage cloud images on Proxmox |
 | `proxmox-sdn` | VXLAN zone, vnet, and subnet configuration |
 | `envs/common` | Configuration inheritance logic |
-| `envs/{dev,prod}` | Environment-specific cluster definitions |
-| `cluster` | Multi-cluster orchestration |
+| `envs/{dev,k8s,test}` | Environment-specific cluster definitions |
 
 ### Dev Environment Network Topology
 
