@@ -2,9 +2,19 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.70.0"
+      version = "0.90.0"
     }
   }
+}
+
+# SDN - VXLAN overlay network for VM isolation
+module "sdn" {
+  source         = "../../proxmox-sdn"
+  zone_id        = "homestak"
+  vnet_id        = "vnet10"
+  peers          = ["10.0.12.124"]
+  subnet_cidr    = "10.10.10.0/24"
+  subnet_gateway = "10.10.10.1"
 }
 
 module "common" {
@@ -26,13 +36,15 @@ module "nodes_constructor" {
   cloud_image_id    = module.cloud_image.file_id
   proxmox_node_name = each.value.proxmox_node_name
   vm_id             = each.value.vm_id
-  vm_bridge         = each.value.bridge
+  vm_bridge         = module.sdn.vnet_id
   vm_hostname       = each.value.hostname
   vm_name           = each.value.hostname
   vm_packages       = each.value.packages
   vm_mac_address    = each.value.mac_address
   vm_ipv4_address   = each.value.ipv4_address
-  vm_ipv4_gateway   = each.value.ipv4_gateway
+  vm_ipv4_gateway   = module.sdn.gateway
   vm_dns_domain     = each.value.dns_domain
   vm_dns_servers    = each.value.dns_servers
+
+  depends_on = [module.sdn]
 }

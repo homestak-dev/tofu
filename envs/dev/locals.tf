@@ -2,11 +2,11 @@ locals {
 
   defaults = {
     proxmox_node_name = "pve"
-    bridge            = "vmbr0"
+    bridge            = "vnet10"
     dns_domain        = "homestak"
-    dns_servers       = ["10.0.12.1"]
-    ipv4_gateway      = "10.0.12.1"
-    packages          = ["git","net-tools"]
+    dns_servers       = ["10.10.10.1"]
+    ipv4_gateway      = "10.10.10.1"
+    packages          = ["git", "net-tools"]
   }
 
   clusters = {
