@@ -23,7 +23,7 @@ tofu/
 └── envs/
     ├── common/       # Shared logic (node inheritance/merging)
     ├── dev/          # Development environment (SDN + router)
-    ├── k8s/          # Kubernetes environment (dual SDN networks)
+    ├── k8s/          # Kubernetes environment (SDN + router)
     ├── pve-test/     # Debian 13 VM for testing pve-install playbook
     └── test/         # Single test VM (toggle-enabled)
 ```
@@ -94,6 +94,35 @@ Internet
 └─────────┘
 ```
 
+### K8s Environment Network Topology
+
+```
+Internet
+    │
+    ▼
+┌─────────┐
+│  vmbr0  │  (Proxmox bridge - 10.0.12.0/24)
+└────┬────┘
+     │
+┌────┴────┐
+│ router  │  VM 20000 - dual NIC gateway
+│ (ens19) │  10.0.12.x (DHCP from vmbr0)
+│ (ens18) │  10.10.20.1 (static, runs dnsmasq)
+└────┬────┘
+     │
+┌────┴────┐
+│   k8s   │  (SDN VXLAN bridge - 10.10.20.0/24)
+└────┬────┘
+     │
+     ├── sysadm1   VM 20001 - 10.10.20.10 (static)
+     ├── kubeadm1  VM 20101 - 10.10.20.101 (static)
+     ├── kubeadm2  VM 20102 - 10.10.20.102 (static)
+     ├── kubeadm3  VM 20103 - 10.10.20.103 (static)
+     ├── k3s-prod1 VM 20201 - 10.10.20.201 (static)
+     ├── k3s-prod2 VM 20202 - 10.10.20.202 (static)
+     └── k3s-prod3 VM 20203 - 10.10.20.203 (static)
+```
+
 ## Conventions
 
 - **VM IDs**: 5-digit numeric (10000 router, 10001+ VMs)
@@ -105,7 +134,9 @@ Internet
 
 Each environment targets different Proxmox endpoints configured in `terraform.tfvars`:
 - Separate API tokens per environment
-- Distinct IP ranges (10.10.10.0/24 subnets)
+- Distinct IP ranges:
+  - dev: 10.10.10.0/24
+  - k8s: 10.10.20.0/24
 - Environment-specific storage and network bridges
 
 ## Prerequisites
