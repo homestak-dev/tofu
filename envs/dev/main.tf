@@ -189,13 +189,19 @@ resource "null_resource" "boot_sequence" {
     vm_ids    = join(",", [for k, v in module.vm : v.vm_id])
   }
 
-  # Start router first, wait for it, then start other VMs
+  # Start router first, wait for guest agent, then start other VMs
   provisioner "local-exec" {
     command = <<-EOT
       echo "Starting router..."
       qm start 10000
-      echo "Waiting for router to be ready..."
-      sleep 30
+      echo "Waiting for router guest agent..."
+      for i in $(seq 1 30); do
+        if qm guest exec 10000 -- echo ready 2>/dev/null; then
+          echo "Router ready"
+          break
+        fi
+        sleep 2
+      done
       echo "Starting dev VMs..."
       %{for k, v in module.vm~}
       qm start ${v.vm_id}

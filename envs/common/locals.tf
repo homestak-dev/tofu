@@ -7,7 +7,7 @@ locals {
     ipv4_address      = "dhcp"
     ipv4_gateway      = "10.10.10.1"
     dns_domain        = "local"
-    dns_servers       = ["8.8.8.8", "1.1.1.1"]
+    dns_servers       = []
   }
 
   # the nodes data structure "flattens" the sparse cluster_data (defined

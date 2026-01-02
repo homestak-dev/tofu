@@ -1,9 +1,9 @@
 locals {
-  # Simple test environment on vmbr0 (no SDN)
+  # PVE test environment - Debian 13 Trixie for testing PVE install
   defaults = {
     proxmox_node_name = "pve"
     bridge            = "vmbr0"
-    dns_domain        = "test.local"
+    dns_domain        = "homestak"
     dns_servers       = []
     packages          = []
   }
@@ -16,10 +16,13 @@ locals {
   }
 
   clusters = {
-    # Single test VM - toggle count in main.tf to enable/disable
-    test = merge(local.defaults, {
+    # Debian 13 Trixie VM for PVE install testing
+    pve-test = merge(local.defaults, {
       nodes = {
-        1 = merge(local.node_defaults, { vm_id = 99901 })
+        1 = merge(local.node_defaults, {
+          vm_id   = 99913
+          hostname = "debian13"
+        })
       }
     })
   }

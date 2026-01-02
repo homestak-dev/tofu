@@ -44,11 +44,11 @@ EOF
   # Combined per-VM cloud-init
   base_user_data = { for k, v in local.vm_user_data : k => "${v}${local.base_user_data_suffix}" }
 
-  # Router cloud-init - gateway for both k8smgmt and k8sprod networks
+  # Router-specific cloud-init
   router_user_data = <<-EOF
     #cloud-config
-    hostname: k8s-router
-    fqdn: k8s-router.k8s.local
+    hostname: router
+    fqdn: router.k8s.local
 
     users:
       - name: root
@@ -66,21 +66,32 @@ EOF
     package_update: false
     packages:
       - qemu-guest-agent
+      - dnsmasq
       - iptables-persistent
 
     write_files:
       - path: /etc/sysctl.d/99-ip-forward.conf
         content: |
           net.ipv4.ip_forward=1
+      - path: /etc/dnsmasq.d/k8s.conf
+        content: |
+          interface=ens18
+          bind-interfaces
+          dhcp-range=10.10.20.100,10.10.20.200,12h
+          dhcp-option=option:router,10.10.20.1
+          dhcp-option=option:dns-server,10.10.20.1
+          dhcp-option=option:domain-name,k8s.local
+          server=10.0.12.1
 
     runcmd:
       - sysctl -p /etc/sysctl.d/99-ip-forward.conf
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-      - iptables -t nat -A POSTROUTING -o ens20 -j MASQUERADE
-      - iptables -A FORWARD -i ens18 -o ens20 -j ACCEPT
-      - iptables -A FORWARD -i ens19 -o ens20 -j ACCEPT
-      - iptables -A FORWARD -i ens20 -m state --state RELATED,ESTABLISHED -j ACCEPT
+      - systemctl enable dnsmasq
+      - systemctl restart dnsmasq
+      - iptables -t nat -A POSTROUTING -o ens19 -j MASQUERADE
+      - iptables -A FORWARD -i ens18 -o ens19 -j ACCEPT
+      - iptables -A FORWARD -i ens19 -o ens18 -m state --state RELATED,ESTABLISHED -j ACCEPT
       - netfilter-persistent save
   EOF
 
@@ -89,11 +100,8 @@ EOF
     ethernets:
       ens18:
         addresses:
-          - 10.20.10.1/24
+          - 10.10.20.1/24
       ens19:
-        addresses:
-          - 10.20.20.1/24
-      ens20:
         dhcp4: true
   EOF
 }
@@ -110,54 +118,42 @@ module "cloud_image" {
   source_file_path  = "debian-12-generic-amd64.img"
 }
 
-# SDN - mgmt network (sysadm, kubeadm clusters)
-module "sdn_mgmt" {
+# SDN - VXLAN overlay network for VM isolation
+module "sdn" {
   source         = "../../proxmox-sdn"
-  zone_id        = "k8smgmt"
-  vnet_id        = "k8smgmt"
+  zone_id        = "k8s"
+  vnet_id        = "k8s"
   peers          = [var.proxmox_node_ip]
-  subnet_cidr    = "10.20.10.0/24"
-  subnet_gateway = "10.20.10.1"
+  subnet_cidr    = "10.10.20.0/24"
+  subnet_gateway = "10.10.20.1"
   vxlan_tag      = 200
-}
-
-# SDN - prod network (k3s-prod cluster)
-module "sdn_prod" {
-  source         = "../../proxmox-sdn"
-  zone_id        = "k8sprod"
-  vnet_id        = "k8sprod"
-  peers          = [var.proxmox_node_ip]
-  subnet_cidr    = "10.20.20.0/24"
-  subnet_gateway = "10.20.20.1"
-  vxlan_tag      = 201
 }
 
 # Final SDN applier - ensures config is applied after all SDN resources on destroy
 resource "proxmox_virtual_environment_sdn_applier" "this" {
-  depends_on = [module.sdn_mgmt, module.sdn_prod]
+  depends_on = [module.sdn]
 }
 
-# Router VM - gateway for k8smgmt and k8sprod networks
+# Router VM - provides DHCP and NAT for SDN
 module "router" {
   source = "../../proxmox-vm"
 
   cloud_image_id    = module.cloud_image.file_id
   proxmox_node_name = var.proxmox_node_name
   vm_id             = 20000
-  vm_name           = "k8s-router"
-  vm_started        = true
+  vm_name           = "router"
+  vm_started        = false # Started by boot_sequence below
   vm_startup_order  = 1
 
   network_devices = [
-    { bridge = module.sdn_mgmt.vnet_id },  # ens18 - k8smgmt (10.20.10.1)
-    { bridge = module.sdn_prod.vnet_id },  # ens19 - k8sprod (10.20.20.1)
-    { bridge = "vmbr0" }                    # ens20 - External
+    { bridge = module.sdn.vnet_id }, # ens18 - Internal SDN
+    { bridge = "vmbr0" }             # ens19 - External
   ]
 
   cloud_init_user_data    = local.router_user_data
   cloud_init_network_data = local.router_network_data
 
-  depends_on = [module.sdn_mgmt, module.sdn_prod]
+  depends_on = [module.sdn]
 }
 
 # K8s VMs
@@ -170,14 +166,45 @@ module "vm" {
   vm_id             = each.value.vm_id
   vm_name           = each.value.hostname
 
-  network_devices = [{ bridge = each.value.bridge }]
+  network_devices = [{ bridge = module.sdn.vnet_id }]
 
   cloud_init_user_data = local.base_user_data[each.key]
 
   vm_ipv4_address = each.value.ipv4_address
-  vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : each.value.ipv4_gateway
+  vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : module.sdn.gateway
   vm_dns_domain   = each.value.dns_domain
   vm_dns_servers  = each.value.dns_servers
 
-  depends_on = [module.sdn_mgmt, module.sdn_prod]
+  depends_on = [module.sdn] # No router dependency - parallel provisioning
+}
+
+# Boot VMs in sequence after parallel provisioning
+resource "null_resource" "boot_sequence" {
+  # Re-run if any VM is recreated
+  triggers = {
+    router_id = module.router.vm_id
+    vm_ids    = join(",", [for k, v in module.vm : v.vm_id])
+  }
+
+  # Start router first, wait for guest agent, then start other VMs
+  provisioner "local-exec" {
+    command = <<-EOT
+      echo "Starting router..."
+      qm start 20000
+      echo "Waiting for router guest agent..."
+      for i in $(seq 1 30); do
+        if qm guest exec 20000 -- echo ready 2>/dev/null; then
+          echo "Router ready"
+          break
+        fi
+        sleep 2
+      done
+      echo "Starting k8s VMs..."
+      %{for k, v in module.vm~}
+      qm start ${v.vm_id}
+      %{endfor~}
+    EOT
+  }
+
+  depends_on = [module.router, module.vm]
 }
