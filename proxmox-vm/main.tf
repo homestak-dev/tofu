@@ -14,16 +14,10 @@ resource "proxmox_virtual_environment_file" "cloud_init_meta" {
   node_name    = var.proxmox_node_name
   source_raw {
     data = <<-EOF
-      #cloud-config
-      local-hostname: "${var.vm_hostname}"
-      timezone: "America/Denver"
-      packages:
-        - qemu-guest-agent
-      ${join("\n", formatlist("  - %s", var.vm_packages))}
-      package_update: false
-      package_upgrade: false
+      instance-id: ${var.vm_hostname}
+      local-hostname: ${var.vm_hostname}
       EOF
-    file_name = "meta-data.${var.vm_hostname}.yaml"
+    file_name = "${var.vm_hostname}-meta.yaml"
   }
 }
 
@@ -34,19 +28,17 @@ resource "proxmox_virtual_environment_file" "cloud_init_user" {
   node_name    = var.proxmox_node_name
   source_file {
     path       = "${path.module}/user-data.yaml"
-    file_name  = "user-data.${var.vm_hostname}.yaml"
+    file_name  = "${var.vm_hostname}-user.yaml"
   }
 }
 
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_vm.md
 resource "proxmox_virtual_environment_vm" "this" {
   agent {
-    enabled = false
+    enabled = true
   }
   cpu {
-    cores = 2
-    flags = [ ]
-    type  = "x86-64-v2-AES"
+    type = "host"
   }
   disk {
     datastore_id = "local-zfs"
@@ -78,20 +70,19 @@ resource "proxmox_virtual_environment_vm" "this" {
     ]
   }
   memory {
-    dedicated = 4096  # maximum allocated
-    floating  = 2048  # minimum allocated
+    dedicated = 4096
   }
   name = var.vm_name
   network_device {
     bridge      = var.vm_bridge
     mac_address = var.vm_mac_address
-    mtu         = 1
     vlan_id     = var.vm_vlan_id
   }
   node_name = var.proxmox_node_name
   operating_system {
     type = "l26"
   }
+  serial_device {}
   reboot  = false
   started = false
   startup {

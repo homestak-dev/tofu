@@ -45,6 +45,8 @@ resource "proxmox_virtual_environment_file" "router_cloud_init_user" {
         - name: root
           lock_passwd: false
           hashed_passwd: $6$rounds=500000$uCCa0piztTDbgiIJ$8ekZqACZr9iACDdbW5eCgIQVHOETlTTu/RkIBf.7nsHfJgop30M8c/tAXbzqz.cJfGxF8cLiXYzGKeu65ZUCg.
+          ssh_authorized_keys:
+            - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCqZRMXskxuD1sVvspZ3Ut97vcGbQxmfDGnZu3AOjgK2VBdQZAzc9R0pvrhZiS26rM4pg54yNdyzgV9dgxRB9FUzgkW87GcjG3EcODo9vFqhsDp3628JiIQXw78vISMZtVcArGhVgjA9qfw3YnZscdOp735HeG2RyglhumPDkFgs6g3FhqQ+e+W8t0LT3+CyWtSMQwy3VSQi+VhUfueLuuxSjbi9FDEpse550ZldwKJjgloaXfs95MWjV4gs7xVnHlNnSNUvbxKntmRWoM8c3jD8zOsgQHFNDtHRT7xIt7OteIhhg2tRPdDFXfihnt/2ij9kwttD/UGhTDe7wCSrln1uaQZsUjeSlMyihQ7dvjlz8IqZNHMz8XaaPFroxIsTyh4A9njhym28BJ7VMlwsM8VwloPBKPf/MoQ6VyejXHyQ9ScqHkiOlXEUX/CPxOUL1Q0voeZGyYw4tLErGuG/GdeyIl1S8nRh7F/eR2uj9zYmhAYx3MtLzqAm0K2DT+9v6n2kWg3biJQXLUxL2rTEeBIF5jgX0+CWRDrZ6MIwXws3/9AdkxPR6QIubWWIPbpBI0m4/vB7R9+2C7Xge1cZFIxCedpx4IY5Y9x2vsqeMM56Iw8IGyt9Sm1yN0cdrtCThnKA0SCVUzbTsqjF8ifzN+yOdbtZxRtHR8msdLx6rk/tQ== root@pve"
         - name: jderose
           groups: sudo
           shell: /bin/bash
@@ -83,7 +85,7 @@ resource "proxmox_virtual_environment_file" "router_cloud_init_user" {
         - iptables -A FORWARD -i ens19 -o ens18 -m state --state RELATED,ESTABLISHED -j ACCEPT
         - netfilter-persistent save
       EOF
-    file_name = "router-user-data.yaml"
+    file_name = "router-user.yaml"
   }
 }
 
@@ -102,7 +104,7 @@ resource "proxmox_virtual_environment_file" "router_cloud_init_network" {
         ens19:
           dhcp4: true
       EOF
-    file_name = "router-network-data.yaml"
+    file_name = "router-network.yaml"
   }
 }
 
@@ -114,24 +116,19 @@ resource "proxmox_virtual_environment_vm" "router" {
   on_boot   = true
 
   agent {
-    enabled = false
-  }
-
-  cpu {
-    cores = 1
-    type  = "x86-64-v2-AES"
+    enabled = true
   }
 
   memory {
-    dedicated = 1024
-    floating  = 512
+    dedicated = 4096
   }
 
   disk {
     datastore_id = "local-zfs"
     file_id      = module.cloud_image.file_id
+    file_format  = "raw"
     interface    = "virtio0"
-    size         = 4
+    size         = 10
     discard      = "on"
     iothread     = true
   }
@@ -162,6 +159,8 @@ resource "proxmox_virtual_environment_vm" "router" {
     type = "l26"
   }
 
+  serial_device {}
+
   depends_on = [module.sdn]
 }
 
@@ -179,7 +178,7 @@ module "nodes_constructor" {
   vm_packages       = each.value.packages
   vm_mac_address    = each.value.mac_address
   vm_ipv4_address   = each.value.ipv4_address
-  vm_ipv4_gateway   = module.sdn.gateway
+  vm_ipv4_gateway   = each.value.ipv4_address == "dhcp" ? null : module.sdn.gateway
   vm_dns_domain     = each.value.dns_domain
   vm_dns_servers    = each.value.dns_servers
 
