@@ -10,7 +10,7 @@ terraform {
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_download_file.md
 resource "proxmox_virtual_environment_download_file" "this" {
   content_type       = "iso"
-  datastore_id       = "cephfs"
+  datastore_id       = "local"
   node_name          = var.proxmox_node_name
   url                = var.source_file_url
   checksum           = var.source_file_checksum_val
