@@ -10,6 +10,7 @@
 .terraform.tfstate.lock.info
 terraform.rc
 terraform.tfvars
+!terraform.tfvars.enc
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.*.backup

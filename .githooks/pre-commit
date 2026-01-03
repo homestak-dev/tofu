@@ -1,0 +1,37 @@
+#!/bin/bash
+# Auto-encrypt modified terraform.tfvars files, block plaintext commits
+
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+# Find terraform.tfvars files that have been modified and encrypt them
+for plainfile in $(find envs -name "terraform.tfvars" -type f 2>/dev/null); do
+    encfile="${plainfile}.enc"
+
+    # If plaintext is newer than encrypted (or encrypted doesn't exist), re-encrypt
+    if [ ! -f "$encfile" ] || [ "$plainfile" -nt "$encfile" ]; then
+        echo "Encrypting: $plainfile -> $encfile"
+        sops -e "$plainfile" > "$encfile"
+        git add "$encfile"
+    fi
+done
+
+# Block any plaintext terraform.tfvars from being committed
+PLAINTEXT_STAGED=$(git diff --cached --name-only | grep -E "envs/.*/terraform\.tfvars$" | grep -v "\.enc$" || true)
+if [ -n "$PLAINTEXT_STAGED" ]; then
+    echo "ERROR: Plaintext terraform.tfvars staged for commit:"
+    echo "$PLAINTEXT_STAGED"
+    echo ""
+    echo "These files should be gitignored. Run: git reset HEAD <file>"
+    exit 1
+fi
+
+# Verify staged .enc files are actually encrypted
+# Check for "sops" key in both YAML (^sops:) and JSON ("sops":) formats
+for encfile in $(git diff --cached --name-only | grep "\.tfvars\.enc$" || true); do
+    if [ -f "$encfile" ] && ! grep -qE '(^sops:|"sops":)' "$encfile" 2>/dev/null; then
+        echo "ERROR: $encfile doesn't appear to be SOPS-encrypted"
+        exit 1
+    fi
+done
