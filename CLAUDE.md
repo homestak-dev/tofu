@@ -38,7 +38,7 @@ tofu/
 ```
 
 - **proxmox-setup**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
-- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed for faster VM boot times (~15-20s vs ~50-60s with cloud-init package install).
+- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed and unnecessary modules blacklisted. Use `./build.sh` to build, `./publish.sh` to stage to Proxmox storage. Boot time: ~16s vs ~35s with stock images.
 
 ## Key Technologies
 
@@ -64,10 +64,37 @@ Node configuration flows through a merge hierarchy in `envs/common/locals.tf`:
 | Module | Purpose |
 |--------|---------|
 | `proxmox-vm` | Atomic VM resource (CPU, memory, disk, network, cloud-init) |
-| `proxmox-file` | Download and manage cloud images on Proxmox |
+| `proxmox-file` | Cloud image management (local or URL source) |
 | `proxmox-sdn` | VXLAN zone, vnet, and subnet configuration |
 | `envs/common` | Configuration inheritance logic |
 | `envs/{dev,k8s,test}` | Environment-specific cluster definitions |
+
+### Cloud Image Sources
+
+The `proxmox-file` module supports two modes via `source_type`:
+
+**Local (default)** - Uses pre-built packer images (~16s boot):
+```hcl
+module "cloud_image" {
+  source        = "../../proxmox-file"
+  local_file_id = "local:iso/debian-12-custom.img"
+}
+```
+
+**URL** - Downloads from remote source (~35s boot):
+```hcl
+module "cloud_image" {
+  source          = "../../proxmox-file"
+  source_type     = "url"
+  source_file_url = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
+  source_file_path = "debian-12-generic-amd64.img"
+}
+```
+
+Packer images must be published before using local mode:
+```bash
+cd /root/packer && ./publish.sh
+```
 
 ### Dev Environment Network Topology
 
