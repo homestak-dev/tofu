@@ -32,6 +32,12 @@ variable "vm_memory" {
   default     = 4096
 }
 
+variable "vm_cpu_cores" {
+  description = "Number of CPU cores"
+  type        = number
+  default     = 1
+}
+
 variable "vm_disk_size" {
   description = "Disk size in GB"
   type        = number

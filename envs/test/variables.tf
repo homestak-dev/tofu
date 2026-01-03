@@ -19,3 +19,9 @@ variable "root_password_hash" {
   sensitive   = true
   type        = string
 }
+
+variable "vm_datastore_id" {
+  description = "Storage for VM disks (e.g., local-zfs, local)"
+  type        = string
+  default     = "local-zfs"
+}

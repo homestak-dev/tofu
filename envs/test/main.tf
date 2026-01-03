@@ -9,7 +9,7 @@ terraform {
 
 # Toggle: set to true to create test VM, false to destroy
 locals {
-  enabled = false
+  enabled = true
 
   # Filter nodes based on enabled flag
   active_nodes = local.enabled ? module.common.nodes : {}
@@ -30,12 +30,6 @@ EOF
         hashed_passwd: ${var.root_password_hash}
         ssh_authorized_keys:
           ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
-      - name: jderose
-        groups: sudo
-        shell: /bin/bash
-        ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
-        sudo: ALL=(ALL) NOPASSWD:ALL
 
     package_update: false
     packages:
@@ -68,6 +62,7 @@ module "vm" {
   proxmox_node_name = each.value.proxmox_node_name
   vm_id             = each.value.vm_id
   vm_name           = each.value.hostname
+  vm_datastore_id   = var.vm_datastore_id
 
   network_devices = [{ bridge = each.value.bridge }]
 
@@ -77,4 +72,8 @@ module "vm" {
   vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : each.value.ipv4_gateway
   vm_dns_domain   = each.value.dns_domain
   vm_dns_servers  = each.value.dns_servers
+}
+
+output "vm_ips" {
+  value = { for k, v in module.vm : k => v.vm_ipv4_addresses }
 }

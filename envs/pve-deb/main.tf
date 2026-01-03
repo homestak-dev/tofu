@@ -7,11 +7,14 @@ terraform {
   }
 }
 
+# Toggle: set to true to create test VM, false to destroy
 locals {
   enabled = true
 
+  # Filter nodes based on enabled flag
   active_nodes = local.enabled ? module.common.nodes : {}
 
+  # Per-VM cloud-init with hostname
   vm_user_data = { for k, v in local.active_nodes : k => <<-EOF
     #cloud-config
     hostname: ${v.hostname}
@@ -28,7 +31,7 @@ EOF
         ssh_authorized_keys:
           ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
 
-    package_update: false
+    package_update: true
     packages:
       - qemu-guest-agent
 
@@ -48,7 +51,7 @@ module "common" {
 module "cloud_image" {
   count         = local.enabled ? 1 : 0
   source        = "../../proxmox-file"
-  local_file_id = "local:iso/debian-12-custom.img"
+  local_file_id = "local:iso/debian-13-custom.img"
 }
 
 module "vm" {
@@ -60,8 +63,10 @@ module "vm" {
   vm_id             = each.value.vm_id
   vm_name           = each.value.hostname
 
-  # Use local storage (not local-zfs) on inner PVE
-  vm_datastore_id = "local"
+  # Larger specs for PVE install
+  vm_cpu_cores = 2
+  vm_memory    = 8192
+  vm_disk_size = 64
 
   network_devices = [{ bridge = each.value.bridge }]
 
@@ -71,8 +76,4 @@ module "vm" {
   vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : each.value.ipv4_gateway
   vm_dns_domain   = each.value.dns_domain
   vm_dns_servers  = each.value.dns_servers
-}
-
-output "vm_ips" {
-  value = { for k, v in module.vm : k => v.vm_ipv4_addresses }
 }
