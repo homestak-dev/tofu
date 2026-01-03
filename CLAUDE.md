@@ -24,8 +24,8 @@ tofu/
     ├── common/       # Shared logic (node inheritance/merging)
     ├── dev/          # Development environment (SDN + router)
     ├── k8s/          # Kubernetes environment (SDN + router)
-    ├── pve-test/     # Debian 13 VM for testing pve-install playbook
-    └── test/         # Single test VM (toggle-enabled)
+    ├── pve-deb/      # Debian 13 VM for E2E testing (inner PVE)
+    └── test/         # Test VM (works on any PVE via tfvars)
 ```
 
 ## Related Projects
@@ -34,11 +34,13 @@ tofu/
 /root/homestak/
 ├── ansible/          # Ansible playbooks for PVE configuration
 ├── packer/           # Custom cloud images with pre-installed packages
+├── scripts/          # E2E test helpers
+├── test-runs/        # Generated test reports
 └── tofu/             # This project - VM provisioning
 ```
 
-- **ansible**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
-- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed and unnecessary modules blacklisted. Use `./build.sh` to build, `./publish.sh` to stage to Proxmox storage. Boot time: ~16s vs ~35s with stock images.
+- **ansible**: Playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-deb` environment provisions VMs for E2E testing.
+- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed. Boot time: ~16s vs ~35s with stock images.
 
 ## Key Technologies
 
@@ -187,6 +189,39 @@ resource "proxmox_virtual_environment_vm" "example" {
 ```
 
 Reference: https://forum.proxmox.com/threads/160125/
+
+## E2E Testing Environments
+
+### pve-deb (Inner PVE)
+
+Provisions a Debian 13 VM for PVE installation and nested VM testing.
+
+| Property | Value |
+|----------|-------|
+| VM ID | 99913 |
+| Hostname | pve-deb |
+| CPU | 2 cores (faster packer builds) |
+| Memory | 8192 MB |
+| Disk | 64 GB on local-zfs |
+| Image | debian-13-custom.img |
+
+**Usage:**
+```bash
+cd /root/homestak/tofu/envs/pve-deb
+tofu apply
+```
+
+### test (Parameterized Test VM)
+
+Works on both outer and inner PVE via tfvars. Key variables:
+
+| Variable | Outer PVE | Inner PVE |
+|----------|-----------|-----------|
+| `proxmox_node_name` | pve | pve-deb |
+| `vm_datastore_id` | local-zfs | local |
+| `proxmox_api_endpoint` | https://pve:8006 | https://<inner-ip>:8006 |
+
+The `nested-pve` Ansible role auto-generates tfvars for inner PVE usage.
 
 ## Provider Documentation
 
