@@ -194,36 +194,12 @@ Reference: https://forum.proxmox.com/threads/160125/
 
 ## E2E Testing Environments
 
-### pve-deb (Inner PVE)
+| Environment | Purpose |
+|-------------|---------|
+| `pve-deb` | Inner PVE VM (Debian 13 + Proxmox VE, 2 cores, 8GB, 64GB) |
+| `test` | Parameterized test VM (works on outer or inner PVE via tfvars) |
 
-Provisions a Debian 13 VM for PVE installation and nested VM testing.
-
-| Property | Value |
-|----------|-------|
-| VM ID | 99913 |
-| Hostname | pve-deb |
-| CPU | 2 cores (faster packer builds) |
-| Memory | 8192 MB |
-| Disk | 64 GB on local-zfs |
-| Image | debian-13-custom.img |
-
-**Usage:**
-```bash
-cd envs/pve-deb  # from tofu/
-tofu apply
-```
-
-### test (Parameterized Test VM)
-
-Works on both outer and inner PVE via tfvars. Key variables:
-
-| Variable | Outer PVE | Inner PVE |
-|----------|-----------|-----------|
-| `proxmox_node_name` | pve | pve-deb |
-| `vm_datastore_id` | local-zfs | local |
-| `proxmox_api_endpoint` | https://pve:8006 | https://<inner-ip>:8006 |
-
-The `nested-pve` Ansible role auto-generates tfvars for inner PVE usage.
+See `../iac-driver/CLAUDE.md` for full E2E procedure and architecture.
 
 ## Provider Documentation
 
