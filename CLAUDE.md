@@ -30,17 +30,19 @@ tofu/
 
 ## Related Projects
 
+Sibling repositories (same parent directory):
+
 ```
-/root/homestak/
+<parent>/
 ├── ansible/          # Ansible playbooks for PVE configuration
-├── packer/           # Custom cloud images with pre-installed packages
-├── scripts/          # E2E test helpers
-├── test-runs/        # Generated test reports
+├── iac-driver/       # E2E test orchestration
+├── packer/           # Custom cloud images
 └── tofu/             # This project - VM provisioning
 ```
 
-- **ansible**: Playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-deb` environment provisions VMs for E2E testing.
-- **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed. Boot time: ~16s vs ~35s with stock images.
+- **ansible**: Playbooks for configuring Proxmox hosts and installing PVE on Debian 13
+- **iac-driver**: E2E test scripts and reports
+- **packer**: Custom Debian cloud images with qemu-guest-agent pre-installed (~16s boot vs ~35s stock)
 
 ## Key Technologies
 
@@ -95,7 +97,7 @@ module "cloud_image" {
 
 Packer images must be published before using local mode:
 ```bash
-cd /root/homestak/packer && ./publish.sh
+cd ../packer && ./publish.sh
 ```
 
 ### Dev Environment Network Topology
@@ -207,7 +209,7 @@ Provisions a Debian 13 VM for PVE installation and nested VM testing.
 
 **Usage:**
 ```bash
-cd /root/homestak/tofu/envs/pve-deb
+cd envs/pve-deb  # from tofu/
 tofu apply
 ```
 
