@@ -30,19 +30,38 @@ tofu/
 
 ## Related Projects
 
-Sibling repositories (same parent directory):
+Part of the [homestak-dev](https://github.com/homestak-dev) organization:
+
+| Repo | Purpose |
+|------|---------|
+| [ansible](https://github.com/homestak-dev/ansible) | Proxmox host configuration, PVE installation |
+| [iac-driver](https://github.com/homestak-dev/iac-driver) | E2E test orchestration |
+| [packer](https://github.com/homestak-dev/packer) | Custom Debian cloud images |
+| [tofu](https://github.com/homestak-dev/tofu) | This project - VM provisioning |
+
+## Secrets Management
+
+Credentials are encrypted with [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age):
 
 ```
-<parent>/
-├── ansible/          # Ansible playbooks for PVE configuration
-├── iac-driver/       # E2E test orchestration
-├── packer/           # Custom cloud images
-└── tofu/             # This project - VM provisioning
+envs/
+├── dev/
+│   ├── terraform.tfvars      # Plaintext (gitignored, local only)
+│   └── terraform.tfvars.enc  # Encrypted (committed)
+├── k8s/
+│   └── ...
+└── ...
 ```
 
-- **ansible**: Playbooks for configuring Proxmox hosts and installing PVE on Debian 13
-- **iac-driver**: E2E test scripts and reports
-- **packer**: Custom Debian cloud images with qemu-guest-agent pre-installed (~16s boot vs ~35s stock)
+**Setup:**
+```bash
+make setup    # Configure git hooks, check dependencies
+make decrypt  # Decrypt secrets (requires age key at ~/.config/sops/age/keys.txt)
+```
+
+**Makefile targets:** `setup`, `decrypt`, `encrypt`, `clean`, `check`
+
+Git hooks auto-encrypt on commit and auto-decrypt on checkout.
 
 ## Key Technologies
 
@@ -173,6 +192,8 @@ Each environment targets different Proxmox endpoints configured in `terraform.tf
 ## Prerequisites
 
 - OpenTofu CLI installed
+- age + sops for secrets decryption (see `make setup`)
+- age key at `~/.config/sops/age/keys.txt`
 - SSH key at `~/.ssh/id_rsa`
 - Proxmox API access (endpoint + token in terraform.tfvars)
 - Network connectivity to Proxmox API
