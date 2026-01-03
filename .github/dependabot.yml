@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "terraform"
+    directory: "/envs/dev"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "terraform"
+    directory: "/envs/k8s"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "terraform"
+    directory: "/envs/pve-deb"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "terraform"
+    directory: "/envs/test"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
