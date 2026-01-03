@@ -1,7 +1,19 @@
+variable "source_type" {
+  description = "Image source: 'url' (download) or 'local' (pre-staged)"
+  type        = string
+  default     = "local"
+}
+
+variable "local_file_id" {
+  description = "Proxmox file ID for local image (when source_type = 'local')"
+  type        = string
+  default     = null
+}
+
 variable "proxmox_node_name" {
   description = "Proxmox Node Name; e.g.: pve1"
-  default = "pve1"
-  type = string
+  default     = "pve"
+  type        = string
 }
 
 variable "source_file_path" {

@@ -112,10 +112,8 @@ module "common" {
 }
 
 module "cloud_image" {
-  source            = "../../proxmox-file"
-  proxmox_node_name = var.proxmox_node_name
-  source_file_url   = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
-  source_file_path  = "debian-12-generic-amd64.img"
+  source        = "../../proxmox-file"
+  local_file_id = "local:iso/debian-12-custom.img"
 }
 
 # SDN - VXLAN overlay network for VM isolation

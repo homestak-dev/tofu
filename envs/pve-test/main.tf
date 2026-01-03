@@ -49,12 +49,9 @@ module "common" {
 }
 
 module "cloud_image" {
-  count             = local.enabled ? 1 : 0
-  source            = "../../proxmox-file"
-  proxmox_node_name = var.proxmox_node_name
-  # Debian 13 Trixie daily cloud image
-  source_file_url   = "https://cloud.debian.org/images/cloud/trixie/daily/latest/debian-13-generic-amd64-daily.qcow2"
-  source_file_path  = "debian-13-generic-amd64-daily.img"
+  count         = local.enabled ? 1 : 0
+  source        = "../../proxmox-file"
+  local_file_id = "local:iso/debian-13-custom.img"
 }
 
 module "vm" {

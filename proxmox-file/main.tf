@@ -9,13 +9,15 @@ terraform {
 
 # https://github.com/bpg/terraform-provider-proxmox/blob/main/docs/resources/virtual_environment_download_file.md
 resource "proxmox_virtual_environment_download_file" "this" {
-  content_type       = "iso"
-  datastore_id       = "local"
-  node_name          = var.proxmox_node_name
-  url                = var.source_file_url
-  file_name          = var.source_file_path
-  checksum           = var.source_file_checksum_val
-  checksum_algorithm = var.source_file_checksum_algo
-  overwrite_unmanaged= true
+  count = var.source_type == "url" ? 1 : 0
+
+  content_type        = "iso"
+  datastore_id        = "local"
+  node_name           = var.proxmox_node_name
+  url                 = var.source_file_url
+  file_name           = var.source_file_path
+  checksum            = var.source_file_checksum_val
+  checksum_algorithm  = var.source_file_checksum_algo
+  overwrite_unmanaged = true
 }
 

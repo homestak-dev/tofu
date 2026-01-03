@@ -13,7 +13,8 @@ module "common" {
 }
 
 module "cloud_image" {
-  source = "../../proxmox-file"
+  source        = "../../proxmox-file"
+  local_file_id = "local:iso/debian-12-custom.img"
 }
 
 module "nodes_constructor" {
