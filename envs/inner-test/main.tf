@@ -1,0 +1,78 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "0.90.0"
+    }
+  }
+}
+
+locals {
+  enabled = true
+
+  active_nodes = local.enabled ? module.common.nodes : {}
+
+  vm_user_data = { for k, v in local.active_nodes : k => <<-EOF
+    #cloud-config
+    hostname: ${v.hostname}
+    fqdn: ${v.hostname}.${v.dns_domain}
+
+    users:
+EOF
+  }
+
+  base_user_data_suffix = <<-EOF
+      - name: root
+        lock_passwd: false
+        hashed_passwd: ${var.root_password_hash}
+        ssh_authorized_keys:
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+
+    package_update: false
+    packages:
+      - qemu-guest-agent
+
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
+EOF
+
+  base_user_data = { for k, v in local.vm_user_data : k => "${v}${local.base_user_data_suffix}" }
+}
+
+module "common" {
+  source   = "../common"
+  clusters = local.clusters
+}
+
+module "cloud_image" {
+  count         = local.enabled ? 1 : 0
+  source        = "../../proxmox-file"
+  local_file_id = "local:iso/debian-12-custom.img"
+}
+
+module "vm" {
+  source   = "../../proxmox-vm"
+  for_each = local.active_nodes
+
+  cloud_image_id    = module.cloud_image[0].file_id
+  proxmox_node_name = each.value.proxmox_node_name
+  vm_id             = each.value.vm_id
+  vm_name           = each.value.hostname
+
+  # Use local storage (not local-zfs) on inner PVE
+  vm_datastore_id = "local"
+
+  network_devices = [{ bridge = each.value.bridge }]
+
+  cloud_init_user_data = local.base_user_data[each.key]
+
+  vm_ipv4_address = each.value.ipv4_address
+  vm_ipv4_gateway = each.value.ipv4_address == "dhcp" ? null : each.value.ipv4_gateway
+  vm_dns_domain   = each.value.dns_domain
+  vm_dns_servers  = each.value.dns_servers
+}
+
+output "vm_ips" {
+  value = { for k, v in module.vm : k => v.vm_ipv4_addresses }
+}

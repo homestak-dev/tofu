@@ -23,7 +23,7 @@ locals {
           {
             cluster_name      = cluster_name
             instance_num      = length(keys(cluster_data.nodes)) > 0 ? i + 1 : ""
-            hostname          = "${cluster_name}${length(keys(cluster_data.nodes)) > 0 ? i + 1 : ""}"
+            hostname          = try(cluster_data.nodes[i + 1].hostname, "${cluster_name}${length(keys(cluster_data.nodes)) > 0 ? i + 1 : ""}")
             proxmox_node_name = try(cluster_data.nodes[i + 1].proxmox_node_name, cluster_data.proxmox_node_name, local.default_settings.proxmox_node_name)
             vm_id             = try(cluster_data.nodes[i + 1].vm_id, null)
             mac_address       = try(cluster_data.nodes[i + 1].mac_address, cluster_data.mac_address, local.default_settings.mac_address)

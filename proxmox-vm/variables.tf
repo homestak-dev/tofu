@@ -38,6 +38,12 @@ variable "vm_disk_size" {
   default     = 10
 }
 
+variable "vm_datastore_id" {
+  description = "Datastore for VM disk and cloud-init drive"
+  type        = string
+  default     = "local-zfs"
+}
+
 variable "vm_started" {
   description = "Whether VM should be started after creation"
   type        = bool

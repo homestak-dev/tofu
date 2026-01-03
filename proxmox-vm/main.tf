@@ -55,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   disk {
-    datastore_id = "local-zfs"
+    datastore_id = var.vm_datastore_id
     file_id      = var.cloud_image_id
     file_format  = "raw"
     interface    = "virtio0"
@@ -75,7 +75,7 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   # Use custom network-data file if provided, otherwise use Proxmox ip_config
   initialization {
-    datastore_id         = "local-zfs"
+    datastore_id         = var.vm_datastore_id
     user_data_file_id    = proxmox_virtual_environment_file.cloud_init_user.id
     network_data_file_id = var.cloud_init_network_data != null ? proxmox_virtual_environment_file.cloud_init_network[0].id : null
 
