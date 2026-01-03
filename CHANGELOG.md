@@ -2,11 +2,7 @@
 
 ## Unreleased
 
-### Dependencies
-
-- Bump bpg/proxmox provider 0.90.0 → 0.91.0
-  - New: ACME certificate ordering, SDN Fabric resources, storage provisioning
-  - Fix: Scientific notation handling, TPM state updates
+- Bump bpg/proxmox provider to 0.91.0
 
 ## v0.1.0-rc1 - 2026-01-03
 
