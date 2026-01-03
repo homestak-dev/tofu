@@ -31,13 +31,13 @@ tofu/
 ## Related Projects
 
 ```
-/root/
-├── tofu/             # This project - VM provisioning
-├── proxmox-setup/    # Ansible playbooks for PVE configuration
-└── packer/           # Custom cloud images with pre-installed packages
+/root/homestak/
+├── ansible/          # Ansible playbooks for PVE configuration
+├── packer/           # Custom cloud images with pre-installed packages
+└── tofu/             # This project - VM provisioning
 ```
 
-- **proxmox-setup**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
+- **ansible**: Ansible playbooks for configuring Proxmox hosts and installing PVE on Debian 13. The `pve-test` environment provisions Debian 13 VMs for testing the `pve-install.yml` playbook.
 - **packer**: Builds custom Debian cloud images with qemu-guest-agent pre-installed and unnecessary modules blacklisted. Use `./build.sh` to build, `./publish.sh` to stage to Proxmox storage. Boot time: ~16s vs ~35s with stock images.
 
 ## Key Technologies
@@ -93,7 +93,7 @@ module "cloud_image" {
 
 Packer images must be published before using local mode:
 ```bash
-cd /root/packer && ./publish.sh
+cd /root/homestak/packer && ./publish.sh
 ```
 
 ### Dev Environment Network Topology
