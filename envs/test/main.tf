@@ -29,7 +29,7 @@ EOF
         lock_passwd: false
         hashed_passwd: ${var.root_password_hash}
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.all_ssh_keys)))}
 
     package_update: false
     packages:
