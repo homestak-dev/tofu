@@ -1,7 +1,0 @@
-# SOPS configuration for secrets encryption
-# Add age public keys for all hosts that need decrypt access
-
-creation_rules:
-  - path_regex: envs/.*/terraform\.tfvars$
-    age: >-
-      age19g7xlyf8fndus5zzh72w7hlac28fzefwasa2rh6aju74eyh2tq8q2jhc2g
