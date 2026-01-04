@@ -2,7 +2,16 @@
 
 ## Unreleased
 
+### Features
+
+- Add configurable `ssh_user` for Proxmox provider (supports non-root SSH)
 - Bump bpg/proxmox provider to 0.91.0
+
+### Changes
+
+- **BREAKING**: Move secrets to [site-config](https://github.com/homestak-dev/site-config) repository
+- Environment tfvars now in `site-config/envs/*/terraform.tfvars`
+- Remove in-repo SOPS encryption (Makefile, .githooks, .sops.yaml, *.tfvars.enc)
 
 ## v0.1.0-rc1 - 2026-01-03
 
