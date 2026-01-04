@@ -1,22 +1,38 @@
 # tofu Makefile
-# Secrets management with SOPS + age
+# Dependency installation and secrets management
 
-.PHONY: setup decrypt encrypt clean check help
+.PHONY: help install-deps setup decrypt encrypt clean check
 
 help:
-	@echo "Secrets Management"
+	@echo "tofu Setup"
 	@echo ""
+	@echo "  make install-deps  - Install OpenTofu"
+	@echo ""
+	@echo "Secrets Management:"
 	@echo "  make setup    - Configure git hooks and check dependencies"
 	@echo "  make decrypt  - Decrypt all terraform.tfvars.enc files"
 	@echo "  make encrypt  - Encrypt all terraform.tfvars files"
 	@echo "  make clean    - Remove plaintext terraform.tfvars (keeps .enc)"
 	@echo "  make check    - Verify encryption setup"
 	@echo ""
-	@echo "Prerequisites:"
+	@echo "Prerequisites (for secrets):"
 	@echo "  - age:  apt install age"
 	@echo "  - sops: https://github.com/getsops/sops/releases"
 	@echo ""
 	@echo "Age key location: ~/.config/sops/age/keys.txt"
+
+install-deps:
+	@echo "Installing OpenTofu..."
+	@apt-get update -qq
+	@apt-get install -y -qq apt-transport-https ca-certificates curl gnupg > /dev/null
+	@install -m 0755 -d /etc/apt/keyrings
+	@curl -fsSL https://get.opentofu.org/opentofu.gpg | tee /etc/apt/keyrings/opentofu.gpg >/dev/null
+	@curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg 2>/dev/null || true
+	@chmod a+r /etc/apt/keyrings/opentofu.gpg /etc/apt/keyrings/opentofu-repo.gpg
+	@echo "deb [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main" > /etc/apt/sources.list.d/opentofu.list
+	@apt-get update -qq
+	@apt-get install -y -qq tofu > /dev/null
+	@echo "Done."
 
 setup:
 	@echo "Configuring git hooks..."
