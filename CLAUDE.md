@@ -34,8 +34,9 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization:
 
 | Repo | Purpose |
 |------|---------|
+| [bootstrap](https://github.com/homestak-dev/bootstrap) | Entry point - curl\|bash setup |
 | [ansible](https://github.com/homestak-dev/ansible) | Proxmox host configuration, PVE installation |
-| [iac-driver](https://github.com/homestak-dev/iac-driver) | E2E test orchestration |
+| [iac-driver](https://github.com/homestak-dev/iac-driver) | Orchestration engine |
 | [packer](https://github.com/homestak-dev/packer) | Custom Debian cloud images |
 | [tofu](https://github.com/homestak-dev/tofu) | This project - VM provisioning |
 
