@@ -1,3 +1,0 @@
-#!/bin/bash
-# Auto-decrypt after pull/merge - delegates to post-checkout
-exec "$(dirname "$0")/post-checkout"

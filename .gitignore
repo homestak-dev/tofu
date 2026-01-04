@@ -9,9 +9,10 @@
 .terraform.lock.hcl
 .terraform.tfstate.lock.info
 terraform.rc
-terraform.tfvars
-!terraform.tfvars.enc
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.*.backup
 tfplan
+
+# Secrets are managed in site-config
+# See: ../site-config/ or https://github.com/homestak-dev/site-config

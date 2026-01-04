@@ -25,3 +25,9 @@ variable "vm_datastore_id" {
   type        = string
   default     = "local-zfs"
 }
+
+variable "ssh_user" {
+  description = "SSH user for Proxmox provider (must have sudo access)"
+  type        = string
+  default     = "root"
+}

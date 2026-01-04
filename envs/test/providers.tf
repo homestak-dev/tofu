@@ -7,7 +7,7 @@ provider "proxmox" {
   ssh {
     agent       = false
     private_key = file("~/.ssh/id_rsa")
-    username    = "root"
+    username    = var.ssh_user
   }
   random_vm_ids = true
   tmp_dir       = "/var/tmp"

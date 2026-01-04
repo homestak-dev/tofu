@@ -11,14 +11,16 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization.
 ## Quick Start
 
 ```bash
-# Clone and setup
+# Clone tofu and site-config
 git clone https://github.com/homestak-dev/tofu.git
-cd tofu
-make setup      # Configure git hooks
-make decrypt    # Decrypt secrets (requires age key)
+git clone https://github.com/homestak-dev/site-config.git
+
+# Setup secrets
+cd site-config
+make setup && make decrypt
 
 # Deploy an environment
-cd envs/dev
+cd ../tofu/envs/dev
 tofu init
 tofu plan
 tofu apply
@@ -26,16 +28,9 @@ tofu apply
 
 ## Secrets Management
 
-Credentials are encrypted with [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age).
+Credentials are managed in the [site-config](https://github.com/homestak-dev/site-config) repository using SOPS + age.
 
-```bash
-make setup    # Configure git hooks, check dependencies
-make decrypt  # Decrypt terraform.tfvars in all envs
-make encrypt  # Re-encrypt after changes
-make check    # Verify setup
-```
-
-**First-time setup:** You need an age key at `~/.config/sops/age/keys.txt`.
+See [site-config README](https://github.com/homestak-dev/site-config#readme) for setup instructions.
 
 ## Project Structure
 
@@ -55,7 +50,7 @@ tofu/
 ## Prerequisites
 
 - OpenTofu CLI
-- age + sops for secrets
+- [site-config](https://github.com/homestak-dev/site-config) set up and decrypted
 - SSH key at `~/.ssh/id_rsa`
 - Proxmox API access
 
@@ -68,6 +63,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture, network topology, and conv
 | Repo | Purpose |
 |------|---------|
 | [bootstrap](https://github.com/homestak-dev/bootstrap) | Entry point - curl\|bash setup |
+| [site-config](https://github.com/homestak-dev/site-config) | Site-specific secrets and configuration |
 | [ansible](https://github.com/homestak-dev/ansible) | Proxmox host configuration |
 | [iac-driver](https://github.com/homestak-dev/iac-driver) | Orchestration engine |
 | [packer](https://github.com/homestak-dev/packer) | Custom Debian cloud images |

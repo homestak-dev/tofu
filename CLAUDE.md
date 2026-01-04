@@ -35,6 +35,7 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization:
 | Repo | Purpose |
 |------|---------|
 | [bootstrap](https://github.com/homestak-dev/bootstrap) | Entry point - curl\|bash setup |
+| [site-config](https://github.com/homestak-dev/site-config) | Site-specific secrets and configuration |
 | [ansible](https://github.com/homestak-dev/ansible) | Proxmox host configuration, PVE installation |
 | [iac-driver](https://github.com/homestak-dev/iac-driver) | Orchestration engine |
 | [packer](https://github.com/homestak-dev/packer) | Custom Debian cloud images |
@@ -42,27 +43,25 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization:
 
 ## Secrets Management
 
-Credentials are encrypted with [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age):
+Credentials are managed in the [site-config](https://github.com/homestak-dev/site-config) repository using [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age).
 
 ```
-envs/
-├── dev/
-│   ├── terraform.tfvars      # Plaintext (gitignored, local only)
-│   └── terraform.tfvars.enc  # Encrypted (committed)
-├── k8s/
-│   └── ...
-└── ...
+site-config/
+├── hosts/              # Per-host Proxmox credentials
+│   └── {host}.tfvars   # API endpoint, token, node name
+└── envs/               # Per-environment tofu config
+    └── {env}/
+        └── terraform.tfvars
 ```
 
 **Setup:**
 ```bash
+cd ../site-config
 make setup    # Configure git hooks, check dependencies
 make decrypt  # Decrypt secrets (requires age key at ~/.config/sops/age/keys.txt)
 ```
 
-**Makefile targets:** `setup`, `decrypt`, `encrypt`, `clean`, `check`
-
-Git hooks auto-encrypt on commit and auto-decrypt on checkout.
+See [site-config README](https://github.com/homestak-dev/site-config#readme) for full setup instructions.
 
 ## Key Technologies
 
@@ -193,10 +192,9 @@ Each environment targets different Proxmox endpoints configured in `terraform.tf
 ## Prerequisites
 
 - OpenTofu CLI installed
-- age + sops for secrets decryption (see `make setup`)
-- age key at `~/.config/sops/age/keys.txt`
+- site-config repository set up and decrypted (see [site-config](https://github.com/homestak-dev/site-config))
 - SSH key at `~/.ssh/id_rsa`
-- Proxmox API access (endpoint + token in terraform.tfvars)
+- Proxmox API access (endpoint + token in site-config)
 - Network connectivity to Proxmox API
 
 ## Known Issues
