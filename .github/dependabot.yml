@@ -11,7 +11,7 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "terraform"
-    directory: "/envs/pve-deb"
+    directory: "/envs/nested-pve"
     schedule:
       interval: "weekly"
 

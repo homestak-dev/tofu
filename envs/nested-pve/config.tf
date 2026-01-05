@@ -3,6 +3,6 @@ module "config" {
   source = "../../modules/config-loader"
 
   site_config_path = var.site_config_path
-  env              = "pve-deb"
+  env              = "nested-pve"
   node             = var.node  # Optional override
 }

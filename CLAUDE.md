@@ -29,7 +29,7 @@ tofu/
     ├── common/           # Shared logic (node inheritance/merging)
     ├── dev/              # Development environment (SDN + router)
     ├── k8s/              # Kubernetes environment (SDN + router)
-    ├── pve-deb/          # Debian 13 VM for E2E testing (inner PVE)
+    ├── nested-pve/       # Debian 13 (Trixie) VM for PVE 9.x installation
     └── test/             # Test VM (works on any PVE)
 ```
 
@@ -266,14 +266,12 @@ resource "proxmox_virtual_environment_vm" "example" {
 
 Reference: https://forum.proxmox.com/threads/160125/
 
-## E2E Testing Environments
+## Environment Specifications
 
-| Environment | Purpose |
-|-------------|---------|
-| `pve-deb` | Inner PVE VM (Debian 13 + Proxmox VE, 2 cores, 8GB, 64GB) |
-| `test` | Parameterized test VM (works on outer or inner PVE) |
-
-See `../iac-driver/CLAUDE.md` for full E2E procedure and architecture.
+| Environment | VM Specs |
+|-------------|----------|
+| `nested-pve` | Debian 13, 2 cores, 8GB RAM, 64GB disk |
+| `test` | Debian 12, 1 core, 2GB RAM, 20GB disk |
 
 ## Provider Documentation
 
