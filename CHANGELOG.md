@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Phase 5: Generic Environment
+
+- Add `envs/generic/` - receives pre-resolved config from iac-driver
+- **Breaking:** Delete `modules/config-loader/` (replaced by iac-driver ConfigResolver)
+- **Breaking:** Delete `envs/dev/`, `envs/k8s/`, `envs/nested-pve/`, `envs/test/`
+- Keep `envs/common/` and `envs/prod/` (legacy)
+- tofu now acts as "dumb executor" - all config logic in iac-driver
+
 ## v0.5.0-rc1 - 2026-01-04
 
 Consolidated pre-release with config-loader module.
