@@ -43,7 +43,7 @@ tofu/
     ├── common/       # Shared configuration logic
     ├── dev/          # Development environment
     ├── k8s/          # Kubernetes environment
-    ├── nested-pve/   # Debian 13 VM for PVE installation
+    ├── nested-pve/   # Debian 13 (Trixie) VM for PVE 9.x installation
     └── test/         # Parameterized test VM
 ```
 

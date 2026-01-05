@@ -29,7 +29,7 @@ tofu/
     ├── common/           # Shared logic (node inheritance/merging)
     ├── dev/              # Development environment (SDN + router)
     ├── k8s/              # Kubernetes environment (SDN + router)
-    ├── nested-pve/       # Debian 13 VM for PVE installation
+    ├── nested-pve/       # Debian 13 (Trixie) VM for PVE 9.x installation
     └── test/             # Test VM (works on any PVE)
 ```
 

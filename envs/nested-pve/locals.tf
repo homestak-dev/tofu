@@ -1,5 +1,5 @@
 locals {
-  # Nested PVE environment - Debian 13 Trixie VM for PVE installation
+  # Nested PVE environment - Debian 13 (Trixie) VM for PVE 9.x installation
   defaults = {
     proxmox_node_name = module.config.node
     bridge            = "vmbr0"
@@ -16,7 +16,7 @@ locals {
   }
 
   clusters = {
-    # Debian 13 Trixie VM for PVE installation
+    # Debian 13 (Trixie) VM for PVE 9.x installation
     nested-pve = merge(local.defaults, {
       nodes = {
         1 = merge(local.node_defaults, {
