@@ -43,7 +43,7 @@ tofu/
     ├── common/       # Shared configuration logic
     ├── dev/          # Development environment
     ├── k8s/          # Kubernetes environment
-    ├── pve-deb/      # E2E testing (inner PVE)
+    ├── nested-pve/   # E2E testing (inner PVE)
     └── test/         # Parameterized test VM
 ```
 

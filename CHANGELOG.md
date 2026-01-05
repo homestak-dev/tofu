@@ -54,7 +54,7 @@ Consolidated pre-release with config-loader module.
 
 - **dev**: Development environment with SDN isolation
 - **k8s**: Kubernetes environment with SDN isolation
-- **pve-deb**: Inner PVE VM for E2E testing
+- **nested-pve**: Inner PVE VM for E2E testing
 - **test**: Parameterized test VM (works on any PVE host)
 
 ### Infrastructure

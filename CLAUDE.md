@@ -29,7 +29,7 @@ tofu/
     ├── common/           # Shared logic (node inheritance/merging)
     ├── dev/              # Development environment (SDN + router)
     ├── k8s/              # Kubernetes environment (SDN + router)
-    ├── pve-deb/          # Debian 13 VM for E2E testing (inner PVE)
+    ├── nested-pve/       # Debian 13 VM for E2E testing (inner PVE)
     └── test/             # Test VM (works on any PVE)
 ```
 
@@ -270,7 +270,7 @@ Reference: https://forum.proxmox.com/threads/160125/
 
 | Environment | Purpose |
 |-------------|---------|
-| `pve-deb` | Inner PVE VM (Debian 13 + Proxmox VE, 2 cores, 8GB, 64GB) |
+| `nested-pve` | Inner PVE VM (Debian 13 + Proxmox VE, 2 cores, 8GB, 64GB) |
 | `test` | Parameterized test VM (works on outer or inner PVE) |
 
 See `../iac-driver/CLAUDE.md` for full E2E procedure and architecture.

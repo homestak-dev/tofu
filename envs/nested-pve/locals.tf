@@ -17,11 +17,11 @@ locals {
 
   clusters = {
     # Debian 13 Trixie VM for PVE install testing
-    pve-deb = merge(local.defaults, {
+    nested-pve = merge(local.defaults, {
       nodes = {
         1 = merge(local.node_defaults, {
-          vm_id   = 99913
-          hostname = "pve-deb"
+          vm_id    = 99913
+          hostname = "nested-pve"
         })
       }
     })
