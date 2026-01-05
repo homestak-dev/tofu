@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.5.0-rc1 - 2026-01-04
+
+Consolidated pre-release with config-loader module.
+
+### Highlights
+
+- config-loader module for YAML configuration
+- Loads from site-config/nodes/*.yaml and envs/*.yaml
+- Resolves secrets by key reference
+
+### Changes
+
+- Documentation improvements
+- Cross-repo consistency updates
+
 ## v0.3.0 - 2026-01-04
 
 ### Features
