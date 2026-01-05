@@ -13,7 +13,7 @@ variable "env" {
 }
 
 variable "node" {
-  description = "Optional node override (defaults to env's node reference)"
+  description = "Target PVE node. Required when env is node-agnostic (no node: field). Overrides env's node reference if both provided."
   type        = string
   default     = null
 }

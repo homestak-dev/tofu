@@ -12,8 +12,12 @@ tofu apply     # Apply changes
 tofu destroy   # Tear down (use with caution)
 tofu fmt       # Format HCL files
 
+# Deploy to a specific node (required - envs are node-agnostic templates)
+tofu apply -var="node=pve"
+tofu apply -var="node=father"
+
 # With custom site-config path (development)
-tofu plan -var="site_config_path=/path/to/site-config"
+tofu plan -var="node=pve" -var="site_config_path=/path/to/site-config"
 ```
 
 ## Project Structure
@@ -54,10 +58,10 @@ Configuration is loaded from site-config YAML files via the `config-loader` modu
 site-config/
 ├── site.yaml           # Site-wide defaults (timezone, domain, datastore)
 ├── secrets.yaml        # All sensitive values (SOPS encrypted)
-├── nodes/              # PVE instance configuration
+├── nodes/              # PVE instance configuration (primary key from filename)
 │   └── {node}.yaml     # API endpoint, token ref, datastore
-└── envs/               # Environment configuration
-    └── {env}.yaml      # Node reference, env-specific settings
+└── envs/               # Deployment topology templates (node-agnostic)
+    └── {env}.yaml      # env-specific settings, node at deploy time
 ```
 
 ### Config-Loader Module
@@ -70,8 +74,8 @@ module "config" {
   source = "../../modules/config-loader"
 
   site_config_path = var.site_config_path  # Default: /opt/homestak/site-config
-  env              = "dev"                  # Environment name
-  node             = var.node               # Optional node override
+  env              = "dev"                  # Environment name (from filename)
+  node             = var.node               # Target PVE node (required)
 }
 
 # Use outputs in providers and resources
@@ -241,7 +245,7 @@ Internet
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `site_config_path` | /opt/homestak/site-config | Path to site-config directory |
-| `node` | (from env.yaml) | Optional node override |
+| `node` | (required) | Target PVE node - envs are node-agnostic templates |
 
 ## Prerequisites
 

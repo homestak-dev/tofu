@@ -14,7 +14,9 @@ locals {
   secrets     = yamldecode(file("${var.site_config_path}/secrets.yaml"))
 
   # Determine which node to use (var.node override or env's node reference)
-  node_name   = coalesce(var.node, local.env_config.node)
+  # Envs are node-agnostic templates - node is specified at deploy time via -var="node=..."
+  # Fallback to env's node field for backward compatibility
+  node_name   = coalesce(var.node, try(local.env_config.node, null))
   node_config = yamldecode(file("${var.site_config_path}/nodes/${local.node_name}.yaml"))
 
   # Site defaults (from site.yaml)
@@ -34,8 +36,8 @@ locals {
 
   # Merged configuration with precedence: env > node > defaults
   merged = {
-    # Identity
-    env  = local.env_config.env
+    # Identity (derived from filenames, not file content)
+    env  = var.env
     node = local.node_name
 
     # API configuration (from node)
@@ -84,5 +86,14 @@ locals {
     # Secrets
     root_password = local.root_password
     ssh_keys      = local.ssh_keys
+  }
+}
+
+# Validate that a node was specified
+# Required when env file is node-agnostic (no node: field)
+check "node_required" {
+  assert {
+    condition     = local.node_name != null
+    error_message = "Node must be specified via -var=\"node=<name>\" when env file has no node: field"
   }
 }
