@@ -170,6 +170,26 @@ resource "proxmox_virtual_environment_vm" "example" {
 
 Reference: https://forum.proxmox.com/threads/160125/
 
+### OpenTofu State Version 4 Bug
+
+When `TF_DATA_DIR` contains a `terraform.tfstate` file, OpenTofu's legacy code path reads it and rejects valid v4 states with error:
+```
+Error: Failed to load state: OpenTofu 1.11.2 does not support state version 4, please update.
+```
+
+**Root Cause**: Legacy code in `internal/legacy/tofu/state.go` has `StateVersion = 3` and is incorrectly triggered when state exists in `TF_DATA_DIR`.
+
+**Workaround**: Store state file outside `TF_DATA_DIR`:
+```
+.states/{env}-{node}/
+├── data/                 # TF_DATA_DIR points here
+│   ├── modules/
+│   └── providers/
+└── terraform.tfstate     # State file at parent level
+```
+
+iac-driver implements this workaround in all tofu actions. See [opentofu/opentofu#3643](https://github.com/opentofu/opentofu/issues/3643).
+
 ## Provider Documentation
 
 - https://search.opentofu.org/provider/bpg/proxmox/latest
