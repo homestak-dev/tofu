@@ -1,26 +1,14 @@
-variable "proxmox_node_name" {
-  description = "Proxmox Node Name; e.g.: pve1"
-  type = string
-}
+# Configuration variables
+# Credentials are loaded from site-config via the config-loader module
 
-variable "proxmox_api_endpoint" {
-  description = "Proxmox API endpoint; e.g.: https://pve.domain.net:8006"
-  type = string
-}
-
-variable "proxmox_api_token" {
-  description = "Proxmox API token; e.g.: USER@pve!provider=TOKEN"
-  sensitive   = true
+variable "site_config_path" {
+  description = "Path to site-config directory"
   type        = string
+  default     = "/opt/homestak/site-config"
 }
 
-variable "root_password_hash" {
-  description = "Hashed root password for VMs (generate with: mkpasswd -m sha-512)"
-  sensitive   = true
+variable "node" {
+  description = "Optional node override (defaults to env's node reference)"
   type        = string
-}
-
-variable "proxmox_node_ip" {
-  description = "Proxmox node IP for VXLAN tunnel endpoint"
-  type        = string
+  default     = null
 }

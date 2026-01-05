@@ -27,9 +27,9 @@ EOF
   base_user_data_suffix = <<-EOF
       - name: root
         lock_passwd: false
-        hashed_passwd: ${var.root_password_hash}
+        hashed_passwd: ${module.config.root_password}
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
 
     package_update: true
     packages:

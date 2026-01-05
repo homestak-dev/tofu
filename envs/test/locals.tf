@@ -1,9 +1,9 @@
 locals {
   # Simple test environment on vmbr0 (no SDN)
   defaults = {
-    proxmox_node_name = var.proxmox_node_name
+    proxmox_node_name = module.config.node
     bridge            = "vmbr0"
-    dns_domain        = "test.local"
+    dns_domain        = module.config.domain
     dns_servers       = []
     packages          = []
   }
@@ -12,7 +12,7 @@ locals {
     vm_id             = null
     mac_address       = null
     ipv4_address      = "dhcp"
-    proxmox_node_name = var.proxmox_node_name
+    proxmox_node_name = module.config.node
   }
 
   clusters = {

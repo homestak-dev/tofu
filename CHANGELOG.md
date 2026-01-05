@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 - 2026-01-04
+
+### Features
+
+- Add `config-loader` module for YAML configuration
+  - Loads from `site-config/nodes/*.yaml` and `site-config/envs/*.yaml`
+  - Resolves secret references from `site-config/secrets.yaml`
+  - Merge order: site.yaml → nodes/{node}.yaml → envs/{env}.yaml → secrets.yaml
+- All environments now use config-loader instead of tfvars
+
+### Changes
+
+- **BREAKING**: Remove tfvars support in favor of YAML configuration
+
+## v0.2.0 - 2026-01-04
 
 ### Features
 

@@ -1,7 +1,7 @@
 locals {
 
   defaults = {
-    proxmox_node_name = "pve"
+    proxmox_node_name = module.config.node
     bridge            = "vnet10"
     dns_domain        = "homestak"
     dns_servers       = ["10.10.10.1"]
@@ -12,7 +12,7 @@ locals {
   clusters = {
     dev = merge(local.defaults, {
         nodes = {
-        1 = { mac_address = null, ipv4_address = "dhcp", vm_id = "10001", proxmox_node_name = "pve" }
+        1 = { mac_address = null, ipv4_address = "dhcp", vm_id = "10001", proxmox_node_name = module.config.node }
         }
       }
     )

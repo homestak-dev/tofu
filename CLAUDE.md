@@ -11,21 +11,26 @@ tofu plan      # Preview changes
 tofu apply     # Apply changes
 tofu destroy   # Tear down (use with caution)
 tofu fmt       # Format HCL files
+
+# With custom site-config path (development)
+tofu plan -var="site_config_path=/path/to/site-config"
 ```
 
 ## Project Structure
 
 ```
 tofu/
-├── proxmox-vm/       # Reusable module: single VM provisioning
-├── proxmox-file/     # Reusable module: cloud image management
-├── proxmox-sdn/      # Reusable module: VXLAN SDN networking
+├── modules/
+│   └── config-loader/    # YAML config loading from site-config
+├── proxmox-vm/           # Reusable module: single VM provisioning
+├── proxmox-file/         # Reusable module: cloud image management
+├── proxmox-sdn/          # Reusable module: VXLAN SDN networking
 └── envs/
-    ├── common/       # Shared logic (node inheritance/merging)
-    ├── dev/          # Development environment (SDN + router)
-    ├── k8s/          # Kubernetes environment (SDN + router)
-    ├── pve-deb/      # Debian 13 VM for E2E testing (inner PVE)
-    └── test/         # Test VM (works on any PVE via tfvars)
+    ├── common/           # Shared logic (node inheritance/merging)
+    ├── dev/              # Development environment (SDN + router)
+    ├── k8s/              # Kubernetes environment (SDN + router)
+    ├── pve-deb/          # Debian 13 VM for E2E testing (inner PVE)
+    └── test/             # Test VM (works on any PVE)
 ```
 
 ## Related Projects
@@ -41,18 +46,70 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization:
 | [packer](https://github.com/homestak-dev/packer) | Custom Debian cloud images |
 | [tofu](https://github.com/homestak-dev/tofu) | This project - VM provisioning |
 
-## Secrets Management
+## Configuration Loading
 
-Credentials are managed in the [site-config](https://github.com/homestak-dev/site-config) repository using [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age).
+Configuration is loaded from site-config YAML files via the `config-loader` module:
 
 ```
 site-config/
-├── hosts/              # Per-host Proxmox credentials
-│   └── {host}.tfvars   # API endpoint, token, node name
-└── envs/               # Per-environment tofu config
-    └── {env}/
-        └── terraform.tfvars
+├── site.yaml           # Site-wide defaults (timezone, domain, datastore)
+├── secrets.yaml        # All sensitive values (SOPS encrypted)
+├── nodes/              # PVE instance configuration
+│   └── {node}.yaml     # API endpoint, token ref, datastore
+└── envs/               # Environment configuration
+    └── {env}.yaml      # Node reference, env-specific settings
 ```
+
+### Config-Loader Module
+
+Each environment uses the config-loader module to load configuration:
+
+```hcl
+# envs/{env}/config.tf
+module "config" {
+  source = "../../modules/config-loader"
+
+  site_config_path = var.site_config_path  # Default: /opt/homestak/site-config
+  env              = "dev"                  # Environment name
+  node             = var.node               # Optional node override
+}
+
+# Use outputs in providers and resources
+provider "proxmox" {
+  endpoint  = module.config.api_endpoint
+  api_token = module.config.api_token
+}
+
+# Available outputs:
+# - module.config.api_endpoint  (Proxmox API URL)
+# - module.config.api_token     (Proxmox API token, sensitive)
+# - module.config.node          (PVE node name)
+# - module.config.datastore     (Default storage)
+# - module.config.ssh_user      (SSH user for provider)
+# - module.config.domain        (DNS domain)
+# - module.config.root_password (VM root password hash, sensitive)
+# - module.config.ssh_keys      (List of SSH public keys, sensitive)
+```
+
+### Merge Order
+
+Configuration is merged with later values overriding earlier:
+
+1. `site.yaml` - Site-wide defaults
+2. `nodes/{node}.yaml` - PVE instance configuration
+3. `envs/{env}.yaml` - Environment-specific settings
+4. `secrets.yaml` - Sensitive values (resolved by reference)
+
+### Secret References
+
+Node and env files reference secrets by key name:
+
+```yaml
+# nodes/pve.yaml
+api_token: pve  # -> secrets.api_tokens.pve
+```
+
+The config-loader resolves these at runtime from the decrypted `secrets.yaml`.
 
 **Setup:**
 ```bash
@@ -61,12 +118,10 @@ make setup    # Configure git hooks, check dependencies
 make decrypt  # Decrypt secrets (requires age key at ~/.config/sops/age/keys.txt)
 ```
 
-See [site-config README](https://github.com/homestak-dev/site-config#readme) for full setup instructions.
-
 ## Key Technologies
 
 - **OpenTofu** - IaC provisioning
-- **bpg/proxmox provider v0.90.0** - Proxmox VE integration
+- **bpg/proxmox provider v0.91.0** - Proxmox VE integration
 - **Cloud-Init** - VM initialization
 - **local-zfs** - Storage backend
 - **Debian Cloud Images** - VM base (Bookworm 12, Trixie 13)
@@ -74,7 +129,7 @@ See [site-config README](https://github.com/homestak-dev/site-config#readme) for
 
 ## Architecture
 
-### 3-Level Configuration Inheritance
+### Configuration Inheritance
 
 Node configuration flows through a merge hierarchy in `envs/common/locals.tf`:
 
@@ -86,6 +141,7 @@ Node configuration flows through a merge hierarchy in `envs/common/locals.tf`:
 
 | Module | Purpose |
 |--------|---------|
+| `modules/config-loader` | Load and merge YAML config from site-config |
 | `proxmox-vm` | Atomic VM resource (CPU, memory, disk, network, cloud-init) |
 | `proxmox-file` | Cloud image management (local or URL source) |
 | `proxmox-sdn` | VXLAN zone, vnet, and subnet configuration |
@@ -180,14 +236,12 @@ Internet
 - **Hostnames**: `{cluster}{instance}` (e.g., dev1, dev2)
 - **Cloud-init files**: `{hostname}-meta.yaml`, `{hostname}-user.yaml`
 
-## Environment Endpoints
+## Environment Variables
 
-Each environment targets different Proxmox endpoints configured in `terraform.tfvars`:
-- Separate API tokens per environment
-- Distinct IP ranges:
-  - dev: 10.10.10.0/24
-  - k8s: 10.10.20.0/24
-- Environment-specific storage and network bridges
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `site_config_path` | /opt/homestak/site-config | Path to site-config directory |
+| `node` | (from env.yaml) | Optional node override |
 
 ## Prerequisites
 
@@ -217,7 +271,7 @@ Reference: https://forum.proxmox.com/threads/160125/
 | Environment | Purpose |
 |-------------|---------|
 | `pve-deb` | Inner PVE VM (Debian 13 + Proxmox VE, 2 cores, 8GB, 64GB) |
-| `test` | Parameterized test VM (works on outer or inner PVE via tfvars) |
+| `test` | Parameterized test VM (works on outer or inner PVE) |
 
 See `../iac-driver/CLAUDE.md` for full E2E procedure and architecture.
 

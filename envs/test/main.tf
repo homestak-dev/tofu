@@ -27,9 +27,9 @@ EOF
   base_user_data_suffix = <<-EOF
       - name: root
         lock_passwd: false
-        hashed_passwd: ${var.root_password_hash}
+        hashed_passwd: ${module.config.root_password}
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.all_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
 
     package_update: false
     packages:
@@ -62,7 +62,7 @@ module "vm" {
   proxmox_node_name = each.value.proxmox_node_name
   vm_id             = each.value.vm_id
   vm_name           = each.value.hostname
-  vm_datastore_id   = var.vm_datastore_id
+  vm_datastore_id   = module.config.datastore
 
   network_devices = [{ bridge = each.value.bridge }]
 

@@ -1,7 +1,7 @@
 locals {
   # Defaults for k8s environment
   defaults = {
-    proxmox_node_name = "pve"
+    proxmox_node_name = module.config.node
     bridge            = "k8s"
     dns_domain        = "k8s.local"
     dns_servers       = ["10.10.20.1"]
@@ -14,7 +14,7 @@ locals {
     vm_id             = null
     mac_address       = null
     ipv4_address      = "dhcp"
-    proxmox_node_name = "pve"
+    proxmox_node_name = module.config.node
   }
 
   clusters = {

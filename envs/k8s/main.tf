@@ -22,14 +22,14 @@ EOF
   base_user_data_suffix = <<-EOF
       - name: root
         lock_passwd: false
-        hashed_passwd: ${var.root_password_hash}
+        hashed_passwd: ${module.config.root_password}
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
       - name: jderose
         groups: sudo
         shell: /bin/bash
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
         sudo: ALL=(ALL) NOPASSWD:ALL
 
     package_update: false
@@ -53,14 +53,14 @@ EOF
     users:
       - name: root
         lock_passwd: false
-        hashed_passwd: ${var.root_password_hash}
+        hashed_passwd: ${module.config.root_password}
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.root_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
       - name: jderose
         groups: sudo
         shell: /bin/bash
         ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", module.common.jderose_ssh_keys)))}
+          ${indent(6, join("\n", formatlist("- \"%s\"", module.config.ssh_keys)))}
         sudo: ALL=(ALL) NOPASSWD:ALL
 
     package_update: false
@@ -121,7 +121,7 @@ module "sdn" {
   source         = "../../proxmox-sdn"
   zone_id        = "k8s"
   vnet_id        = "k8s"
-  peers          = [var.proxmox_node_ip]
+  peers          = [module.config.node_ip]
   subnet_cidr    = "10.10.20.0/24"
   subnet_gateway = "10.10.20.1"
   vxlan_tag      = 200
@@ -137,7 +137,7 @@ module "router" {
   source = "../../proxmox-vm"
 
   cloud_image_id    = module.cloud_image.file_id
-  proxmox_node_name = var.proxmox_node_name
+  proxmox_node_name = module.config.node
   vm_id             = 20000
   vm_name           = "router"
   vm_memory         = 1024
