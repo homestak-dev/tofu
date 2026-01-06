@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/homestak-dev/bootstrap/main/install
 
 # Deploy VMs via scenario
 cd /opt/homestak/iac-driver
-./run.sh --scenario simple-vm-roundtrip --host pve
+./run.sh --scenario simple-vm-roundtrip --host <nodename>
 ```
 
 ### Option B: Module reuse (advanced)
