@@ -1,25 +1,28 @@
 version: 2
 updates:
+  # Reusable modules
   - package-ecosystem: "terraform"
-    directory: "/envs/dev"
+    directory: "/proxmox-vm"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "terraform"
-    directory: "/envs/k8s"
+    directory: "/proxmox-file"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "terraform"
-    directory: "/envs/nested-pve"
+    directory: "/proxmox-sdn"
     schedule:
       interval: "weekly"
 
+  # Primary execution environment
   - package-ecosystem: "terraform"
-    directory: "/envs/test"
+    directory: "/envs/generic"
     schedule:
       interval: "weekly"
 
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
