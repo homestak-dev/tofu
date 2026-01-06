@@ -23,11 +23,9 @@ tofu apply -var-file=/tmp/tfvars.json
 tofu/
 ├── proxmox-vm/           # Reusable module: single VM provisioning
 ├── proxmox-file/         # Reusable module: cloud image management
-├── proxmox-sdn/          # Reusable module: VXLAN SDN networking
+├── proxmox-sdn/          # Reusable module: VXLAN SDN networking (future use)
 └── envs/
-    ├── generic/          # Primary environment - receives config from iac-driver
-    ├── common/           # Shared logic (legacy, used by prod)
-    └── prod/             # Production environment (legacy)
+    └── generic/          # Primary environment - receives config from iac-driver
 ```
 
 ## Architecture

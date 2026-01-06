@@ -1,7 +1,17 @@
+# Module: proxmox-file
+# Manages cloud images for VM provisioning.
+#
+# Supports two modes:
+# - local: Uses pre-staged images (e.g., packer-built)
+# - url: Downloads images from remote source
+#
+# Inputs: source_type, local_file_id or url/path/checksum
+# Outputs: file_id, file_name
+
 terraform {
   required_providers {
     proxmox = {
-      source = "bpg/proxmox"
+      source  = "bpg/proxmox"
       version = ">= 0.90.0"
     }
   }

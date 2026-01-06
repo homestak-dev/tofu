@@ -1,3 +1,9 @@
+# Module: proxmox-vm
+# Provisions a single Proxmox VM with cloud-init configuration.
+#
+# Inputs: node, image, sizing (cpu/memory/disk), network devices, cloud-init data
+# Outputs: vm_id, vm_name, ipv4_addresses, mac_addresses
+
 terraform {
   required_providers {
     proxmox = {

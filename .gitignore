@@ -1,5 +1,8 @@
 **/*.swp
 
+# State directories (managed by iac-driver)
+**/.states/
+
 # https://spacelift.io/blog/terraform-gitignore
 **/.terraform/*
 *.auto.tfvars

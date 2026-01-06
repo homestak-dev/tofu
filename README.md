@@ -4,59 +4,91 @@ OpenTofu modules for Proxmox VM provisioning with cloud-init.
 
 ## Overview
 
-Infrastructure-as-Code project for provisioning virtual machines on Proxmox VE using OpenTofu (Terraform-compatible).
+This repo provides two things:
+
+1. **Reusable modules** - `proxmox-vm`, `proxmox-file`, `proxmox-sdn` can be used standalone by anyone doing Proxmox + OpenTofu work
+
+2. **homestak integration** - `envs/generic` is the execution layer for [iac-driver](https://github.com/homestak-dev/iac-driver) workflows
 
 Part of the [homestak-dev](https://github.com/homestak-dev) organization.
 
 ## Quick Start
 
+### Option A: Full homestak (recommended)
+
+Use iac-driver for orchestrated VM provisioning:
+
 ```bash
-# Clone tofu and site-config
-git clone https://github.com/homestak-dev/tofu.git
-git clone https://github.com/homestak-dev/site-config.git
+# Install homestak
+curl -fsSL https://raw.githubusercontent.com/homestak-dev/bootstrap/main/install.sh | bash
 
-# Setup secrets
-cd site-config
-make setup && make decrypt
-
-# Deploy an environment
-cd ../tofu/envs/dev
-tofu init
-tofu plan
-tofu apply
+# Deploy VMs via scenario
+cd /opt/homestak/iac-driver
+./run.sh --scenario simple-vm-roundtrip --host pve
 ```
 
-## Secrets Management
+### Option B: Module reuse (advanced)
 
-Credentials are managed in the [site-config](https://github.com/homestak-dev/site-config) repository using SOPS + age.
+Use modules directly in your own OpenTofu configuration:
 
-See [site-config README](https://github.com/homestak-dev/site-config#readme) for setup instructions.
+```hcl
+module "vm" {
+  source = "github.com/homestak-dev/tofu//proxmox-vm"
+
+  proxmox_node_name    = "pve"
+  vm_name              = "my-vm"
+  cloud_image_id       = "local:iso/debian-12-generic-amd64.img"
+  cloud_init_user_data = file("cloud-init.yaml")
+
+  vm_cpu_cores = 2
+  vm_memory    = 4096
+  vm_disk_size = 20
+}
+```
+
+### Option C: Direct generic env (debugging only)
+
+Requires manually crafted tfvars.json matching iac-driver schema:
+
+```bash
+cd envs/generic
+tofu init
+tofu plan -var-file=/path/to/tfvars.json
+tofu apply -var-file=/path/to/tfvars.json
+```
 
 ## Project Structure
 
 ```
 tofu/
-├── proxmox-vm/       # Reusable module: VM provisioning
-├── proxmox-file/     # Reusable module: cloud image management
-├── proxmox-sdn/      # Reusable module: VXLAN SDN networking
+├── proxmox-vm/       # Reusable: VM provisioning with cloud-init
+├── proxmox-file/     # Reusable: cloud image management
+├── proxmox-sdn/      # Reusable: VXLAN SDN networking
 └── envs/
-    ├── common/       # Shared configuration logic
-    ├── dev/          # Development environment
-    ├── k8s/          # Kubernetes environment
-    ├── nested-pve/   # Debian 13 (Trixie) VM for PVE 9.x installation
-    └── test/         # Parameterized test VM
+    └── generic/      # homestak: receives config from iac-driver
 ```
+
+## Modules
+
+| Module | Purpose |
+|--------|---------|
+| `proxmox-vm` | Single VM with CPU, memory, disk, network, cloud-init |
+| `proxmox-file` | Cloud image management (local or URL source) |
+| `proxmox-sdn` | VXLAN zone, vnet, and subnet configuration |
 
 ## Prerequisites
 
 - OpenTofu CLI
-- [site-config](https://github.com/homestak-dev/site-config) set up and decrypted
+- Proxmox VE with API access
 - SSH key at `~/.ssh/id_rsa`
-- Proxmox API access
+
+For full homestak integration:
+- [bootstrap](https://github.com/homestak-dev/bootstrap) installed
+- [site-config](https://github.com/homestak-dev/site-config) set up and decrypted
 
 ## Documentation
 
-See [CLAUDE.md](CLAUDE.md) for detailed architecture, network topology, and conventions.
+See [CLAUDE.md](CLAUDE.md) for detailed architecture, configuration flow, and known issues.
 
 ## Related Repos
 

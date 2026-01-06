@@ -1,5 +1,10 @@
-# Generic environment - receives pre-resolved config from iac-driver
-# No site-config access - all values passed via tfvars.json
+# Environment: generic
+# Primary execution environment for iac-driver workflows.
+#
+# Receives pre-resolved configuration via tfvars.json from ConfigResolver.
+# No direct site-config access - all values passed as variables.
+#
+# Usage: tofu apply -var-file=/path/to/tfvars.json
 
 locals {
   # Convert vms list to map keyed by name

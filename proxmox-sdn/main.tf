@@ -1,3 +1,12 @@
+# Module: proxmox-sdn
+# Configures VXLAN SDN for VM network isolation.
+#
+# Creates zone, vnet, subnet, and applies config to all PVE nodes.
+# Currently not integrated into iac-driver workflows (see iac-driver#28).
+#
+# Inputs: zone_id, vnet_id, peers, subnet_cidr, subnet_gateway
+# Outputs: zone_id, vnet_id, subnet_cidr, gateway
+
 terraform {
   required_providers {
     proxmox = {

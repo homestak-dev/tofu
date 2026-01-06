@@ -54,6 +54,26 @@ variable "vms" {
     ip       = optional(string, "dhcp")
     packages = optional(list(string), [])
   }))
+
+  validation {
+    condition     = alltrue([for vm in var.vms : vm.cores > 0 && vm.cores <= 128])
+    error_message = "VM cores must be between 1 and 128."
+  }
+
+  validation {
+    condition     = alltrue([for vm in var.vms : vm.memory >= 512])
+    error_message = "VM memory must be at least 512 MB."
+  }
+
+  validation {
+    condition     = alltrue([for vm in var.vms : vm.disk >= 1])
+    error_message = "VM disk must be at least 1 GB."
+  }
+
+  validation {
+    condition     = alltrue([for vm in var.vms : can(regex("^[a-z][a-z0-9-]*$", vm.name))])
+    error_message = "VM names must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens."
+  }
 }
 
 # Image name to Proxmox file ID mapping
