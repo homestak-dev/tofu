@@ -54,5 +54,5 @@ module "vm" {
   cloud_init_user_data = local.user_data[each.key]
 
   vm_ipv4_address = each.value.ip
-  vm_ipv4_gateway = each.value.ip == "dhcp" ? null : null
+  vm_ipv4_gateway = each.value.ip == "dhcp" ? null : each.value.gateway
 }
