@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.7.0-rc1 - 2026-01-06
+
+### Bug Fixes
+
+- Fix gateway bug in VM provisioning - now correctly passed to cloud-init (closes #20)
+
+### Changes
+
+- Remove `.states/` directory and gitignore entry (moved to iac-driver)
+- Update docs: replace deprecated `pve` with real node names
+- Code review improvements (closes #17, #18, #19)
+- Update Dependabot config for current directory structure
+
 ## v0.6.0-rc1 - 2026-01-06
 
 ### Phase 5: Generic Environment
