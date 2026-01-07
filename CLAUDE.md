@@ -6,7 +6,7 @@ Infrastructure-as-Code project for provisioning virtual machines on Proxmox VE u
 
 ```bash
 # Deploy via iac-driver (recommended)
-./run.sh --scenario simple-vm-roundtrip --host father
+cd ../iac-driver && ./run.sh --scenario vm-roundtrip --host father
 
 # Direct tofu commands (for debugging only)
 cd envs/generic
