@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.7.0-rc1 - 2026-01-06
+## v0.8 - 2026-01-07
+
+No changes - version bump for unified release.
+
+## v0.7 - 2026-01-06
 
 ### Bug Fixes
 
@@ -13,7 +17,7 @@
 - Code review improvements (closes #17, #18, #19)
 - Update Dependabot config for current directory structure
 
-## v0.6.0-rc1 - 2026-01-06
+## v0.6 - 2026-01-06
 
 ### Phase 5: Generic Environment
 
@@ -23,7 +27,7 @@
 - Keep `envs/common/` and `envs/prod/` (legacy)
 - tofu now acts as "dumb executor" - all config logic in iac-driver
 
-## v0.5.0-rc1 - 2026-01-04
+## v0.5 - 2026-01-04
 
 Consolidated pre-release with config-loader module.
 
