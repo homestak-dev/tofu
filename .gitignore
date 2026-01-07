@@ -16,3 +16,4 @@ tfplan
 
 # Secrets are managed in site-config
 # See: ../site-config/ or https://github.com/homestak-dev/site-config
+**/data/
