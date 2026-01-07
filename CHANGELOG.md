@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9 - 2026-01-07
+
+### Features
+
+- Add `debian-13-pve` to default images map for nested PVE testing
+
+### Housekeeping
+
+- Add `**/data/` to .gitignore (TF_DATA_DIR cache from direct tofu runs)
+
 ## v0.8 - 2026-01-07
 
 No changes - version bump for unified release.
