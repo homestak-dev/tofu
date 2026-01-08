@@ -69,6 +69,7 @@ variable "vms" {
     disk     = number
     bridge   = optional(string, "vmbr0")
     ip       = optional(string, "dhcp")
+    gateway  = optional(string)
     packages = optional(list(string), [])
   }))
 }
