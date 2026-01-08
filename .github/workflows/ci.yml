@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.9.0
+
+      - name: Check formatting
+        run: tofu fmt -check -recursive
+
+      - name: Validate modules
+        run: |
+          for module in proxmox-vm proxmox-file proxmox-sdn; do
+            echo "Validating $module..."
+            cd $module
+            tofu init -backend=false
+            tofu validate
+            cd ..
+          done
+
+      - name: Validate environments
+        run: |
+          for env in envs/generic; do
+            echo "Validating $env..."
+            cd $env
+            tofu init -backend=false
+            tofu validate
+            cd ../..
+          done
