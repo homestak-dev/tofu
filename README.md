@@ -90,6 +90,12 @@ For full homestak integration:
 
 See [CLAUDE.md](CLAUDE.md) for detailed architecture, configuration flow, and known issues.
 
+## Third-Party Acknowledgments
+
+| Dependency | Purpose | License |
+|------------|---------|---------|
+| [bpg/proxmox](https://github.com/bpg/terraform-provider-proxmox) | OpenTofu provider for Proxmox API | MPL-2.0 |
+
 ## Related Repos
 
 | Repo | Purpose |
