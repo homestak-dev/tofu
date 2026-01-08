@@ -17,6 +17,11 @@ jobs:
         with:
           tofu_version: 1.9.0
 
+      - name: Create dummy SSH key for validation
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keygen -t rsa -f ~/.ssh/id_rsa -N "" -q
+
       - name: Check formatting
         run: tofu fmt -check -recursive
 
