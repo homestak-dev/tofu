@@ -2,6 +2,7 @@
 
 ## v0.16 - 2026-01-11
 
+- Bump bpg/proxmox provider to 0.92.0 (validated via vm-roundtrip)
 - Release alignment with homestak v0.16
 
 ## v0.13 - 2026-01-10
