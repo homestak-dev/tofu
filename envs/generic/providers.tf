@@ -15,6 +15,10 @@ provider "proxmox" {
     agent       = false
     private_key = file("~/.ssh/id_rsa")
     username    = var.ssh_user
+    node {
+      name    = var.node
+      address = var.ssh_host
+    }
   }
   random_vm_ids = true
   tmp_dir       = "/var/tmp"
