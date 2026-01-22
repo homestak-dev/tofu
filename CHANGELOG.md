@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.39 - 2026-01-22
+
 ### Fixed
 - Add ssh_host variable and node block to generic environment provider
   - Enables remote SSH connections for file uploads on non-localhost nodes
