@@ -23,6 +23,12 @@ variable "ssh_user" {
   default     = "root"
 }
 
+variable "ssh_host" {
+  description = "SSH host for file uploads (defaults to localhost)"
+  type        = string
+  default     = "127.0.0.1"
+}
+
 variable "datastore" {
   description = "Default datastore for VMs"
   type        = string

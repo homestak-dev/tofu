@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Add ssh_host variable and node block to generic environment provider
+  - Enables remote SSH connections for file uploads on non-localhost nodes
+  - Required for recursive-pve scenarios running tofu on inner PVE
+
 ## v0.26 - 2026-01-17
 
 - Release alignment with homestak v0.26
