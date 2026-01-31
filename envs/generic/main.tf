@@ -16,11 +16,15 @@ locals {
     hostname: ${name}
 
     users:
+      - name: ${var.automation_user}
+        groups: sudo
+        shell: /bin/bash
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        ssh_authorized_keys:
+          ${indent(6, join("\n", formatlist("- \"%s\"", var.ssh_keys)))}
       - name: root
         lock_passwd: false
         hashed_passwd: ${var.root_password}
-        ssh_authorized_keys:
-          ${indent(6, join("\n", formatlist("- \"%s\"", var.ssh_keys)))}
 
     package_update: ${length(vm.packages) > 0 ? "true" : "false"}
     packages:
