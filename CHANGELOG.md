@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.41 - 2026-01-31
+
 ### Added
 - Add `automation_user` variable for non-root SSH access (#33)
   - Cloud-init creates non-root user (default: `homestak`) for VM SSH access
