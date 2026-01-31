@@ -74,6 +74,12 @@ variable "vms" {
   }))
 }
 
+# automation_user (v0.41+): Non-root user for VM SSH access
+variable "automation_user" {
+  type    = string
+  default = "homestak"  # Created via cloud-init with sudo access
+}
+
 # Simple for_each over resolved VMs
 module "vm" {
   source   = "../../proxmox-vm"
@@ -81,6 +87,10 @@ module "vm" {
   # ... use each.value.* directly
 }
 ```
+
+**User distinction:**
+- `automation_user` (default: `homestak`) - Non-root user created on VMs via cloud-init, used for SSH access
+- `ssh_user` (from site-config) - User for SSH to PVE hosts (typically `root`)
 
 ## Related Projects
 

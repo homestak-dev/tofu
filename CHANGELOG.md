@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+- Add `automation_user` variable for non-root SSH access (#33)
+  - Cloud-init creates non-root user (default: `homestak`) for VM SSH access
+  - Separates VM automation user from PVE host SSH user (root)
+  - Required for n3-full recursive PVE validation
+
 ## v0.39 - 2026-01-22
 
 ### Fixed
