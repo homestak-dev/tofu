@@ -18,9 +18,15 @@ variable "api_token" {
 }
 
 variable "ssh_user" {
-  description = "SSH user for provisioning"
+  description = "SSH user for provider connection to PVE host"
   type        = string
   default     = "root"
+}
+
+variable "automation_user" {
+  description = "User created in VMs via cloud-init (with sudo)"
+  type        = string
+  default     = "homestak"
 }
 
 variable "ssh_host" {
