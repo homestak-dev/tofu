@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## v0.45 - 2026-02-02
+
+### Theme: Create Integration
+
+Integrates Create phase with Specify mechanism for automatic spec discovery on first boot.
+
 ### Added
 - Add `spec_server` variable for Create → Specify flow (#174)
   - Injects `HOMESTAK_SPEC_SERVER`, `HOMESTAK_IDENTITY`, `HOMESTAK_AUTH_TOKEN` via cloud-init
