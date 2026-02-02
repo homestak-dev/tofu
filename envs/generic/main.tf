@@ -30,10 +30,32 @@ locals {
     packages:
       - qemu-guest-agent
       ${indent(4, join("\n", formatlist("- %s", vm.packages)))}
+%{if var.spec_server != ""}
+
+    write_files:
+      - path: /etc/profile.d/homestak.sh
+        permissions: '0644'
+        content: |
+          # Homestak spec discovery environment variables (v0.45+)
+          export HOMESTAK_SPEC_SERVER=${var.spec_server}
+          export HOMESTAK_IDENTITY=${name}
+%{if vm.auth_token != ""}
+          export HOMESTAK_AUTH_TOKEN=${vm.auth_token}
+%{endif}
+%{endif}
 
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
+%{if var.spec_server != ""}
+      - |
+        # Fetch spec on first boot only (v0.45+)
+        if [ ! -f /usr/local/etc/homestak/state/spec.yaml ]; then
+          mkdir -p /usr/local/etc/homestak/state
+          . /etc/profile.d/homestak.sh
+          /usr/local/bin/homestak spec get 2>/dev/null || true
+        fi
+%{endif}
   EOF
   }
 }

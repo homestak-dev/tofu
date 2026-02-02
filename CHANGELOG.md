@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+- Add `spec_server` variable for Create → Specify flow (#174)
+  - Injects `HOMESTAK_SPEC_SERVER`, `HOMESTAK_IDENTITY`, `HOMESTAK_AUTH_TOKEN` via cloud-init
+  - Writes environment variables to `/etc/profile.d/homestak.sh`
+  - Auto-fetches spec on first boot (idempotent)
+- Add `auth_token` field to `vms` object for posture-based authentication
+
 ## v0.44 - 2026-02-02
 
 - Release alignment with homestak v0.44

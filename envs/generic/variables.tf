@@ -56,16 +56,17 @@ variable "ssh_keys" {
 variable "vms" {
   description = "List of VMs to create (resolved by iac-driver)"
   type = list(object({
-    name     = string
-    vmid     = optional(number)
-    image    = string
-    cores    = number
-    memory   = number
-    disk     = number
-    bridge   = optional(string, "vmbr0")
-    ip       = optional(string, "dhcp")
-    gateway  = optional(string)
-    packages = optional(list(string), [])
+    name       = string
+    vmid       = optional(number)
+    image      = string
+    cores      = number
+    memory     = number
+    disk       = number
+    bridge     = optional(string, "vmbr0")
+    ip         = optional(string, "dhcp")
+    gateway    = optional(string)
+    packages   = optional(list(string), [])
+    auth_token = optional(string, "")
   }))
 
   validation {
@@ -87,6 +88,13 @@ variable "vms" {
     condition     = alltrue([for vm in var.vms : can(regex("^[a-z][a-z0-9-]*$", vm.name))])
     error_message = "VM names must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens."
   }
+}
+
+# Spec server URL for Create → Specify flow (v0.45+)
+variable "spec_server" {
+  description = "Spec server URL for automatic spec discovery"
+  type        = string
+  default     = ""
 }
 
 # Image name to Proxmox file ID mapping
