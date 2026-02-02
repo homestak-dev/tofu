@@ -61,16 +61,17 @@ The `envs/generic/` environment receives pre-resolved config from iac-driver:
 # Variables received from iac-driver
 variable "vms" {
   type = list(object({
-    name     = string
-    vmid     = optional(number)
-    image    = string
-    cores    = number
-    memory   = number
-    disk     = number
-    bridge   = optional(string, "vmbr0")
-    ip       = optional(string, "dhcp")
-    gateway  = optional(string)
-    packages = optional(list(string), [])
+    name       = string
+    vmid       = optional(number)
+    image      = string
+    cores      = number
+    memory     = number
+    disk       = number
+    bridge     = optional(string, "vmbr0")
+    ip         = optional(string, "dhcp")
+    gateway    = optional(string)
+    packages   = optional(list(string), [])
+    auth_token = optional(string, "")  # v0.45+ - posture-based auth token
   }))
 }
 
@@ -78,6 +79,12 @@ variable "vms" {
 variable "automation_user" {
   type    = string
   default = "homestak"  # Created via cloud-init with sudo access
+}
+
+# spec_server (v0.45+): Spec server URL for Create → Specify flow
+variable "spec_server" {
+  type    = string
+  default = ""  # Empty = disabled, no env vars injected
 }
 
 # Simple for_each over resolved VMs
@@ -91,6 +98,33 @@ module "vm" {
 **User distinction:**
 - `automation_user` (default: `homestak`) - Non-root user created on VMs via cloud-init, used for SSH access
 - `ssh_user` (from site-config) - User for SSH to PVE hosts (typically `root`)
+
+### Create → Specify Flow (v0.45+)
+
+When `spec_server` is configured in `site.yaml`, VMs are provisioned with environment variables for automatic spec discovery:
+
+```yaml
+# Cloud-init writes /etc/profile.d/homestak.sh:
+export HOMESTAK_SPEC_SERVER=https://father:44443
+export HOMESTAK_IDENTITY=dev1
+export HOMESTAK_AUTH_TOKEN=...  # Only if posture requires
+```
+
+**First-boot behavior:**
+1. Cloud-init writes environment variables to `/etc/profile.d/homestak.sh`
+2. runcmd checks if spec already exists
+3. If not, runs `homestak spec get` to fetch spec from server
+4. Spec saved to `/usr/local/etc/homestak/state/spec.yaml`
+
+**Auth token by posture:**
+
+| Posture | Auth Method | Token Value |
+|---------|-------------|-------------|
+| dev/local | network | (empty) |
+| stage | site_token | Shared token from secrets |
+| prod | node_token | Per-VM token from secrets |
+
+The auth token is resolved by iac-driver's ConfigResolver based on the environment's posture.
 
 ## Related Projects
 
