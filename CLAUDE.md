@@ -81,7 +81,7 @@ variable "automation_user" {
   default = "homestak"  # Created via cloud-init with sudo access
 }
 
-# spec_server (v0.45+): Spec server URL for Create → Specify flow
+# spec_server (v0.45+): Spec server URL for create → config flow
 variable "spec_server" {
   type    = string
   default = ""  # Empty = disabled, no env vars injected
@@ -99,7 +99,7 @@ module "vm" {
 - `automation_user` (default: `homestak`) - Non-root user created on VMs via cloud-init, used for SSH access
 - `ssh_user` (from site-config) - User for SSH to PVE hosts (typically `root`)
 
-### Create → Specify Flow (v0.45+)
+### Create → Config Flow (v0.45+)
 
 When `spec_server` is configured in `site.yaml`, VMs are provisioned with environment variables for automatic spec discovery:
 
