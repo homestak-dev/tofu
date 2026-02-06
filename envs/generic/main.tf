@@ -49,14 +49,10 @@ locals {
       - systemctl start qemu-guest-agent
 %{if var.spec_server != ""}
       - |
-        # Fetch spec and apply config on first boot (v0.45+)
-        if [ ! -f /usr/local/etc/homestak/state/spec.yaml ]; then
-          mkdir -p /usr/local/etc/homestak/state
-          . /etc/profile.d/homestak.sh
-          /usr/local/bin/homestak spec get --insecure 2>/dev/null || true
-        fi
+        # Fetch spec and apply config on first boot (v0.48+)
         if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
-          /usr/local/lib/homestak/iac-driver/run.sh config 2>/dev/null || true
+          . /etc/profile.d/homestak.sh
+          /usr/local/lib/homestak/iac-driver/run.sh config --fetch --insecure 2>/dev/null || true
         fi
 %{endif}
   EOF
