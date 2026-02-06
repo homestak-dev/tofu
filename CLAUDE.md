@@ -112,9 +112,9 @@ export HOMESTAK_AUTH_TOKEN=...  # Only if posture requires
 
 **First-boot behavior:**
 1. Cloud-init writes environment variables to `/etc/profile.d/homestak.sh`
-2. runcmd checks if spec already exists
-3. If not, runs `homestak spec get` to fetch spec from server
-4. Spec saved to `/usr/local/etc/homestak/state/spec.yaml`
+2. runcmd checks if config-complete marker already exists
+3. If not, runs `./run.sh config --fetch --insecure` (iac-driver fetches spec + applies config)
+4. Spec saved, ansible roles applied, config-complete marker written
 
 **Auth token by posture:**
 
