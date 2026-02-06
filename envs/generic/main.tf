@@ -53,7 +53,7 @@ locals {
         if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
           . /etc/profile.d/homestak.sh
           curl -fsSk "$HOMESTAK_SPEC_SERVER/bootstrap.git/install.sh" | \
-            HOMESTAK_SOURCE="$HOMESTAK_SPEC_SERVER" HOMESTAK_INSECURE=1 bash
+            HOMESTAK_SOURCE="$HOMESTAK_SPEC_SERVER" HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
           /usr/local/lib/homestak/iac-driver/run.sh config --fetch --insecure 2>/dev/null || true
         fi
 %{endif}
