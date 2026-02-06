@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Changed
+- Add controller-based bootstrap to cloud-init runcmd for pull mode (iac-driver#163)
+  - Curls `install.sh` from controller, clones repos via HTTPS
+  - Passes `SKIP_SITE_CONFIG=1` (VMs get config from pre-resolved specs)
+
 ## v0.45 - 2026-02-02
 
 ### Theme: Create Integration

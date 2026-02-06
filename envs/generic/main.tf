@@ -49,9 +49,11 @@ locals {
       - systemctl start qemu-guest-agent
 %{if var.spec_server != ""}
       - |
-        # Fetch spec and apply config on first boot (v0.48+)
+        # Bootstrap from controller + config on first boot (v0.48+)
         if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
           . /etc/profile.d/homestak.sh
+          curl -fsSk "$HOMESTAK_SPEC_SERVER/bootstrap.git/install.sh" | \
+            HOMESTAK_SOURCE="$HOMESTAK_SPEC_SERVER" HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
           /usr/local/lib/homestak/iac-driver/run.sh config --fetch --insecure 2>/dev/null || true
         fi
 %{endif}
