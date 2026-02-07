@@ -5,7 +5,10 @@
 ### Changed
 - Add controller-based bootstrap to cloud-init runcmd for pull mode (iac-driver#163)
   - Curls `install.sh` from controller, clones repos via HTTPS
+  - Passes `HOMESTAK_REF=_working` to clone controller's working branch (not master)
   - Passes `SKIP_SITE_CONFIG=1` (VMs get config from pre-resolved specs)
+  - Fix SSH key indent in cloud-init user-data (6→10 spaces)
+  - Redirect config output to `/var/log/homestak-config.log`
 
 ## v0.45 - 2026-02-02
 
