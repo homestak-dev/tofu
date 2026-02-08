@@ -142,7 +142,7 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization:
 ## Key Technologies
 
 - **OpenTofu** - IaC provisioning
-- **bpg/proxmox provider v0.91.0** - Proxmox VE integration
+- **bpg/proxmox provider** - Proxmox VE integration (version managed by Dependabot)
 - **Cloud-Init** - VM initialization
 - **local-zfs** - Storage backend
 - **Debian Cloud Images** - VM base (Bookworm 12, Trixie 13)
@@ -232,6 +232,17 @@ Error: Failed to load state: OpenTofu 1.11.2 does not support state version 4, p
 ```
 
 iac-driver implements this workaround in all tofu actions. See [opentofu/opentofu#3643](https://github.com/opentofu/opentofu/issues/3643).
+
+## Dependency Updates
+
+Dependabot opens PRs for provider version bumps. Not all dependencies carry equal risk:
+
+| Dependency | Validation Before Merge | Rationale |
+|------------|------------------------|-----------|
+| bpg/proxmox provider | `./run.sh test -M n1-push -H father` | Directly controls VM provisioning via PVE API |
+| GitHub Actions versions | CI passes = sufficient | Only affects CI, not runtime |
+
+The bpg/proxmox provider is the most critical external dependency — it's the interface between tofu and the PVE API. Behavioral changes (e.g., requiring reboots for CPU changes, cloud-init handling) can silently break VM provisioning. Always run an integration smoke test before approving provider bumps.
 
 ## Provider Documentation
 

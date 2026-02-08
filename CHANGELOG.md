@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+- Add dependency update validation guidance to CLAUDE.md (homestak-dev#221)
+- Update provider version reference to note Dependabot management (homestak-dev#221)
+
 ### Changed
 - Add controller-based bootstrap to cloud-init runcmd for pull mode (iac-driver#163)
   - Curls `install.sh` from controller, clones repos via HTTPS
