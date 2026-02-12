@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed
+- Cloud-init injects `HOMESTAK_SERVER` + `HOMESTAK_TOKEN` (was `HOMESTAK_SPEC_SERVER` + `HOMESTAK_IDENTITY` + `HOMESTAK_AUTH_TOKEN`) (iac-driver#187, iac-driver#188)
+
 ### Documentation
 - Add dependency update validation guidance to CLAUDE.md (homestak-dev#221)
 - Update provider version reference to note Dependabot management (homestak-dev#221)

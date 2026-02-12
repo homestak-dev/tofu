@@ -90,9 +90,9 @@ variable "vms" {
   }
 }
 
-# Spec server URL for Create → Specify flow (v0.45+)
+# Server URL for provisioning token flow (#231, env var: HOMESTAK_SERVER)
 variable "spec_server" {
-  description = "Spec server URL for automatic spec discovery"
+  description = "Server URL for provisioning token and bootstrap (becomes HOMESTAK_SERVER)"
   type        = string
   default     = ""
 }

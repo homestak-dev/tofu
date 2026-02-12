@@ -30,30 +30,27 @@ locals {
     packages:
       - qemu-guest-agent
       ${indent(4, join("\n", formatlist("- %s", vm.packages)))}
-%{if var.spec_server != ""}
+%{if var.spec_server != "" && vm.auth_token != ""}
 
     write_files:
       - path: /etc/profile.d/homestak.sh
         permissions: '0644'
         content: |
-          # Homestak spec discovery environment variables (v0.45+)
-          export HOMESTAK_SPEC_SERVER=${var.spec_server}
-          export HOMESTAK_IDENTITY=${name}
-%{if vm.auth_token != ""}
-          export HOMESTAK_AUTH_TOKEN=${vm.auth_token}
-%{endif}
+          # Homestak provisioning environment variables (#231)
+          export HOMESTAK_SERVER=${var.spec_server}
+          export HOMESTAK_TOKEN=${vm.auth_token}
 %{endif}
 
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-%{if var.spec_server != ""}
+%{if var.spec_server != "" && vm.auth_token != ""}
       - |
-        # Bootstrap from controller + config on first boot (v0.48+)
+        # Bootstrap from server + config on first boot (#231)
         if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
           . /etc/profile.d/homestak.sh
-          curl -fsSk "$HOMESTAK_SPEC_SERVER/bootstrap.git/install.sh" | \
-            HOMESTAK_SOURCE="$HOMESTAK_SPEC_SERVER" HOMESTAK_REF=_working HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
+          curl -fsSk "$HOMESTAK_SERVER/bootstrap.git/install.sh" | \
+            HOMESTAK_SOURCE="$HOMESTAK_SERVER" HOMESTAK_REF=_working HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
           /usr/local/lib/homestak/iac-driver/run.sh config --fetch --insecure \
             >>/var/log/homestak-config.log 2>&1 || true
         fi
