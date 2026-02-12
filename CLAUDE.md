@@ -71,7 +71,7 @@ variable "vms" {
     ip         = optional(string, "dhcp")
     gateway    = optional(string)
     packages   = optional(list(string), [])
-    auth_token = optional(string, "")  # v0.45+ - posture-based auth token
+    auth_token = optional(string, "")  # HMAC-signed provisioning token (#231)
   }))
 }
 
@@ -99,32 +99,25 @@ module "vm" {
 - `automation_user` (default: `homestak`) - Non-root user created on VMs via cloud-init, used for SSH access
 - `ssh_user` (from site-config) - User for SSH to PVE hosts (typically `root`)
 
-### Create → Config Flow (v0.45+)
+### Create → Config Flow (#231)
 
-When `spec_server` is configured in `site.yaml`, VMs are provisioned with environment variables for automatic spec discovery:
+When `spec_server` is configured in `site.yaml` and a `spec` FK is set on the node, VMs are provisioned with environment variables for automatic spec discovery and self-configuration:
 
 ```yaml
 # Cloud-init writes /etc/profile.d/homestak.sh:
-export HOMESTAK_SPEC_SERVER=https://father:44443
-export HOMESTAK_IDENTITY=dev1
-export HOMESTAK_AUTH_TOKEN=...  # Only if posture requires
+export HOMESTAK_SERVER=https://father:44443
+export HOMESTAK_TOKEN=eyJ2IjoxLCJuIjoiZGV2MSIsInMiOiJiYXNlIiwiaWF0IjoxNzM5...
 ```
+
+`HOMESTAK_TOKEN` is an HMAC-SHA256 signed provisioning token carrying the node identity and spec FK. Minted by ConfigResolver, verified by the server.
 
 **First-boot behavior:**
 1. Cloud-init writes environment variables to `/etc/profile.d/homestak.sh`
-2. runcmd checks if config-complete marker already exists
-3. If not, runs `./run.sh config --fetch --insecure` (iac-driver fetches spec + applies config)
+2. runcmd bootstraps from server and runs `./run.sh config --fetch --insecure`
+3. iac-driver fetches spec from server (authenticated by provisioning token)
 4. Spec saved, ansible roles applied, config-complete marker written
 
-**Auth token by posture:**
-
-| Posture | Auth Method | Token Value |
-|---------|-------------|-------------|
-| dev/local | network | (empty) |
-| stage | site_token | Shared token from secrets |
-| prod | node_token | Per-VM token from secrets |
-
-The auth token is resolved by iac-driver's ConfigResolver based on the environment's posture.
+**Token conditional:** Both `spec_server` and `auth_token` must be non-empty for cloud-init to inject env vars. If either is missing, the VM boots without homestak integration.
 
 ## Related Projects
 

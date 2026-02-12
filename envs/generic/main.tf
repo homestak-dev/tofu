@@ -36,7 +36,7 @@ locals {
       - path: /etc/profile.d/homestak.sh
         permissions: '0644'
         content: |
-          # Homestak provisioning environment variables (v0.49+)
+          # Homestak provisioning environment variables (#231)
           export HOMESTAK_SERVER=${var.spec_server}
           export HOMESTAK_TOKEN=${vm.auth_token}
 %{endif}
@@ -46,7 +46,7 @@ locals {
       - systemctl start qemu-guest-agent
 %{if var.spec_server != "" && vm.auth_token != ""}
       - |
-        # Bootstrap from server + config on first boot (v0.49+)
+        # Bootstrap from server + config on first boot (#231)
         if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
           . /etc/profile.d/homestak.sh
           curl -fsSk "$HOMESTAK_SERVER/bootstrap.git/install.sh" | \

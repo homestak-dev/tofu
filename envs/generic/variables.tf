@@ -90,7 +90,7 @@ variable "vms" {
   }
 }
 
-# Server URL for provisioning token flow (v0.49+, env var: HOMESTAK_SERVER)
+# Server URL for provisioning token flow (#231, env var: HOMESTAK_SERVER)
 variable "spec_server" {
   description = "Server URL for provisioning token and bootstrap (becomes HOMESTAK_SERVER)"
   type        = string
