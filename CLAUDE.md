@@ -113,7 +113,7 @@ export HOMESTAK_TOKEN=eyJ2IjoxLCJuIjoiZGV2MSIsInMiOiJiYXNlIiwiaWF0IjoxNzM5...
 
 **First-boot behavior:**
 1. Cloud-init writes environment variables to `/etc/profile.d/homestak.sh`
-2. runcmd bootstraps from server and runs `./run.sh config --fetch --insecure`
+2. runcmd bootstraps from server and runs `./run.sh config fetch --insecure && ./run.sh config apply`
 3. iac-driver fetches spec from server (authenticated by provisioning token)
 4. Spec saved, ansible roles applied, config-complete marker written
 
@@ -232,7 +232,7 @@ Dependabot opens PRs for provider version bumps. Not all dependencies carry equa
 
 | Dependency | Validation Before Merge | Rationale |
 |------------|------------------------|-----------|
-| bpg/proxmox provider | `./run.sh test -M n1-push -H father` | Directly controls VM provisioning via PVE API |
+| bpg/proxmox provider | `./run.sh manifest test -M n1-push -H father` | Directly controls VM provisioning via PVE API |
 | GitHub Actions versions | CI passes = sufficient | Only affects CI, not runtime |
 
 The bpg/proxmox provider is the most critical external dependency — it's the interface between tofu and the PVE API. Behavioral changes (e.g., requiring reboots for CPU changes, cloud-init handling) can silently break VM provisioning. Always run an integration smoke test before approving provider bumps.
