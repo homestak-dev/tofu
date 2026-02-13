@@ -51,7 +51,9 @@ locals {
           . /etc/profile.d/homestak.sh
           curl -fsSk "$HOMESTAK_SERVER/bootstrap.git/install.sh" | \
             HOMESTAK_SOURCE="$HOMESTAK_SERVER" HOMESTAK_REF=_working HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
-          /usr/local/lib/homestak/iac-driver/run.sh config --fetch --insecure \
+          /usr/local/lib/homestak/iac-driver/run.sh config fetch --insecure \
+            >>/var/log/homestak-config.log 2>&1 && \
+          /usr/local/lib/homestak/iac-driver/run.sh config apply \
             >>/var/log/homestak-config.log 2>&1 || true
         fi
 %{endif}
