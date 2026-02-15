@@ -157,7 +157,7 @@ The `proxmox-file` module supports two modes via `source_type`:
 ```hcl
 module "cloud_image" {
   source        = "../../proxmox-file"
-  local_file_id = "local:iso/debian-12-custom.img"
+  local_file_id = "local:iso/debian-12.img"
 }
 ```
 
@@ -181,7 +181,7 @@ cd ../packer && ./publish.sh
 - **VM IDs**: 5-digit numeric (vmid_base + index)
 - **MAC prefix**: BC:24:11:*
 - **Hostnames**: Defined in site-config/envs/*.yaml
-- **Images**: Mapped via `var.images` (e.g., "debian-12" → "local:iso/debian-12-custom.img")
+- **Images**: Mapped via `var.images` (e.g., "debian-12" → "local:iso/debian-12.img"). See [packer-pipeline.md](../docs/designs/packer-pipeline.md) for naming conventions.
 
 ## Prerequisites
 
