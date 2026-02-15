@@ -102,8 +102,8 @@ variable "images" {
   description = "Map of image names to Proxmox file IDs"
   type        = map(string)
   default = {
-    "debian-12"     = "local:iso/debian-12-custom.img"
-    "debian-13"     = "local:iso/debian-13-custom.img"
-    "debian-13-pve" = "local:iso/debian-13-pve.img"
+    "debian-12" = "local:iso/debian-12.img"
+    "debian-13" = "local:iso/debian-13.img"
+    "pve-9"     = "local:iso/pve-9.img"
   }
 }

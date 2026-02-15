@@ -157,7 +157,7 @@ The `proxmox-file` module supports two modes via `source_type`:
 ```hcl
 module "cloud_image" {
   source        = "../../proxmox-file"
-  local_file_id = "local:iso/debian-12-custom.img"
+  local_file_id = "local:iso/debian-12.img"
 }
 ```
 
