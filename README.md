@@ -16,15 +16,15 @@ Part of the [homestak-dev](https://github.com/homestak-dev) organization.
 
 ### Option A: Full homestak (recommended)
 
-Use iac-driver for orchestrated VM provisioning:
+Use iac-driver for manifest-driven VM provisioning:
 
 ```bash
 # Install homestak
-curl -fsSL https://raw.githubusercontent.com/homestak-dev/bootstrap/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/homestak-dev/bootstrap/master/install.sh | bash
 
-# Deploy VMs via scenario
-cd /opt/homestak/iac-driver
-./run.sh --scenario simple-vm-roundtrip --host <nodename>
+# Deploy and test a VM
+cd /usr/local/lib/homestak/iac-driver
+./run.sh manifest test -M n1-push -H <nodename>
 ```
 
 ### Option B: Module reuse (advanced)
