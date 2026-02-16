@@ -6,7 +6,7 @@ Infrastructure-as-Code project for provisioning virtual machines on Proxmox VE u
 
 ```bash
 # Deploy via iac-driver (recommended)
-cd ../iac-driver && ./run.sh --scenario vm-roundtrip --host father
+cd ../iac-driver && ./run.sh manifest test -M n1-push -H father
 
 # Direct tofu commands (for debugging only)
 cd envs/generic
@@ -35,14 +35,12 @@ tofu/
 ```
 site-config/                    iac-driver/                    tofu/
 ┌─────────────┐                 ┌──────────────────┐           ┌─────────────┐
-│ vms/        │                 │ ConfigResolver   │           │ envs/       │
-│ ├─presets/  │───resolve──────▶│ - Load YAML      │──tfvars──▶│ generic/    │
-│ └─*.yaml    │                 │ - Merge layers   │  .json    │             │
+│ manifests/  │                 │ ConfigResolver   │           │ envs/       │
+│ presets/    │───resolve──────▶│ - Load YAML      │──tfvars──▶│ generic/    │
+│ specs/      │                 │ - Merge layers   │  .json    │             │
 ├─────────────┤                 │ - Resolve refs   │           │ for_each:   │
-│ envs/*.yaml │                 └──────────────────┘           │   var.vms   │
+│ nodes/*.yaml│                 └──────────────────┘           │   var.vms   │
 ├─────────────┤                                                └─────────────┘
-│ nodes/*.yaml│
-├─────────────┤
 │ secrets.yaml│
 └─────────────┘
 ```
@@ -180,7 +178,7 @@ cd ../packer && ./publish.sh
 
 - **VM IDs**: 5-digit numeric (vmid_base + index)
 - **MAC prefix**: BC:24:11:*
-- **Hostnames**: Defined in site-config/envs/*.yaml
+- **Hostnames**: Defined in site-config manifest `nodes[]` entries
 - **Images**: Mapped via `var.images` (e.g., "debian-12" → "local:iso/debian-12.img"). See [packer-pipeline.md](../docs/designs/packer-pipeline.md) for naming conventions.
 
 ## Prerequisites
