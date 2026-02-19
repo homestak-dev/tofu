@@ -82,4 +82,5 @@ module "vm" {
 
   vm_ipv4_address = each.value.ip
   vm_ipv4_gateway = each.value.ip == "dhcp" ? null : each.value.gateway
+  vm_dns_servers  = length(var.dns_servers) > 0 ? var.dns_servers : null
 }

@@ -90,6 +90,13 @@ variable "vms" {
   }
 }
 
+# DNS servers for cloud-init (v0.51+, #229)
+variable "dns_servers" {
+  description = "List of DNS servers for cloud-init"
+  type        = list(string)
+  default     = []
+}
+
 # Server URL for provisioning token flow (#231, env var: HOMESTAK_SERVER)
 variable "spec_server" {
   description = "Server URL for provisioning token and bootstrap (becomes HOMESTAK_SERVER)"

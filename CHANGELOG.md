@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Wire `dns_servers` variable through generic env to proxmox-vm module — enables explicit DNS config via cloud-init (iac-driver#229)
+
 ### Changed
 - Update `var.images` mapping for simplified packer naming: `debian-12`, `debian-13`, `pve-9` (packer#48)
 - Cloud-init injects `HOMESTAK_SERVER` + `HOMESTAK_TOKEN` (was `HOMESTAK_SPEC_SERVER` + `HOMESTAK_IDENTITY` + `HOMESTAK_AUTH_TOKEN`) (iac-driver#187, iac-driver#188)
