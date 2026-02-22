@@ -37,7 +37,7 @@ module "vm" {
 
   proxmox_node_name    = "pve"
   vm_name              = "my-vm"
-  cloud_image_id       = "local:iso/debian-12-generic-amd64.img"
+  cloud_image_id       = "local:iso/debian-12.img"
   cloud_init_user_data = file("cloud-init.yaml")
 
   vm_cpu_cores = 2
