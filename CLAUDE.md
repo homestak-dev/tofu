@@ -79,16 +79,26 @@ variable "automation_user" {
   default = "homestak"  # Created via cloud-init with sudo access
 }
 
+# dns_servers (v0.50+): Explicit DNS servers for cloud-init
+variable "dns_servers" {
+  type    = list(string)
+  default = []  # Empty = use DHCP-provided DNS
+}
+
 # spec_server (v0.45+): Spec server URL for create → config flow
 variable "spec_server" {
   type    = string
   default = ""  # Empty = disabled, no env vars injected
 }
 
-# dns_servers: Explicit DNS servers for cloud-init network config
-variable "dns_servers" {
-  type    = list(string)
-  default = []  # Empty = use DHCP-provided DNS
+# images: Map of image names to Proxmox file IDs
+variable "images" {
+  type    = map(string)
+  default = {
+    "debian-12" = "local:iso/debian-12.img"
+    "debian-13" = "local:iso/debian-13.img"
+    "pve-9"     = "local:iso/pve-9.img"
+  }
 }
 
 # Simple for_each over resolved VMs
@@ -115,11 +125,12 @@ export HOMESTAK_TOKEN=eyJ2IjoxLCJuIjoiZGV2MSIsInMiOiJiYXNlIiwiaWF0IjoxNzM5...
 
 `HOMESTAK_TOKEN` is an HMAC-SHA256 signed provisioning token carrying the node identity and spec FK. Minted by ConfigResolver, verified by the server.
 
-**First-boot behavior:**
+**First-boot behavior (pull mode):**
 1. Cloud-init writes environment variables to `/etc/profile.d/homestak.sh`
-2. runcmd bootstraps from server and runs `./run.sh config fetch --insecure && ./run.sh config apply`
-3. iac-driver fetches spec from server (authenticated by provisioning token)
-4. Spec saved, ansible roles applied, config-complete marker written
+2. runcmd curls `install.sh` from controller (`HOMESTAK_SOURCE`), clones repos via HTTPS with `HOMESTAK_REF=_working` and `SKIP_SITE_CONFIG=1`
+3. Runs `./run.sh config fetch --insecure && ./run.sh config apply` (output logged to `/var/log/homestak-config.log`)
+4. iac-driver fetches spec from server (authenticated by provisioning token)
+5. Spec saved, ansible roles applied, config-complete marker written
 
 **Token conditional:** Both `spec_server` and `auth_token` must be non-empty for cloud-init to inject env vars. If either is missing, the VM boots without homestak integration.
 
@@ -185,7 +196,7 @@ cd ../packer && ./publish.sh
 - **VM IDs**: 5-digit numeric (vmid_base + index)
 - **MAC prefix**: BC:24:11:*
 - **Hostnames**: Defined in site-config manifest `nodes[]` entries
-- **Images**: Mapped via `var.images` (e.g., "debian-12" → "local:iso/debian-12.img"). See [packer-pipeline.md](../docs/designs/packer-pipeline.md) for naming conventions.
+- **Images**: Mapped via `var.images` — `debian-12`, `debian-13`, `pve-9` → `local:iso/{name}.img`. See [packer-pipeline.md](../docs/designs/packer-pipeline.md) for naming conventions.
 
 ## Prerequisites
 
