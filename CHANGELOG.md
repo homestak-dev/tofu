@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.50 - 2026-02-22
+
 ### Added
 - Wire `dns_servers` variable through generic env to proxmox-vm module — enables explicit DNS config via cloud-init (iac-driver#229)
 
