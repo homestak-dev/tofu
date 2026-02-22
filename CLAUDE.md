@@ -6,7 +6,7 @@ Infrastructure-as-Code project for provisioning virtual machines on Proxmox VE u
 
 ```bash
 # Deploy via iac-driver (recommended)
-cd ../iac-driver && ./run.sh manifest test -M n1-push -H father
+cd ../iac-driver && ./run.sh manifest test -M n1-push -H srv1
 
 # Direct tofu commands (for debugging only)
 cd envs/generic
@@ -119,7 +119,7 @@ When `spec_server` is configured in `site.yaml` and a `spec` FK is set on the no
 
 ```yaml
 # Cloud-init writes /etc/profile.d/homestak.sh:
-export HOMESTAK_SERVER=https://father:44443
+export HOMESTAK_SERVER=https://srv1:44443
 export HOMESTAK_TOKEN=eyJ2IjoxLCJuIjoiZGV2MSIsInMiOiJiYXNlIiwiaWF0IjoxNzM5...
 ```
 
@@ -247,7 +247,7 @@ Dependabot opens PRs for provider version bumps. Not all dependencies carry equa
 
 | Dependency | Validation Before Merge | Rationale |
 |------------|------------------------|-----------|
-| bpg/proxmox provider | `./run.sh manifest test -M n1-push -H father` | Directly controls VM provisioning via PVE API |
+| bpg/proxmox provider | `./run.sh manifest test -M n1-push -H srv1` | Directly controls VM provisioning via PVE API |
 | GitHub Actions versions | CI passes = sufficient | Only affects CI, not runtime |
 
 The bpg/proxmox provider is the most critical external dependency — it's the interface between tofu and the PVE API. Behavioral changes (e.g., requiring reboots for CPU changes, cloud-init handling) can silently break VM provisioning. Always run an integration smoke test before approving provider bumps.
