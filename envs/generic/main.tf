@@ -47,14 +47,11 @@ locals {
 %{if var.spec_server != "" && vm.auth_token != ""}
       - |
         # Bootstrap from server + config on first boot (#231)
-        if [ ! -f /usr/local/etc/homestak/state/config-complete.json ]; then
+        if [ ! -f ~homestak/etc/state/config-complete.json ]; then
           . /etc/profile.d/homestak.sh
           curl -fsSk "$HOMESTAK_SERVER/bootstrap.git/install.sh" | \
-            HOMESTAK_SOURCE="$HOMESTAK_SERVER" HOMESTAK_REF=_working HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 bash
-          /usr/local/lib/homestak/iac-driver/run.sh config fetch --insecure \
-            >>/var/log/homestak-config.log 2>&1 && \
-          /usr/local/lib/homestak/iac-driver/run.sh config apply \
-            >>/var/log/homestak-config.log 2>&1 || true
+            HOMESTAK_SOURCE="$HOMESTAK_SERVER" HOMESTAK_REF=_working \
+            HOMESTAK_INSECURE=1 SKIP_SITE_CONFIG=1 HOMESTAK_APPLY=config bash
         fi
 %{endif}
   EOF
