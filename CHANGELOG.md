@@ -6,6 +6,9 @@
 
 - **Sudo-less migration**: Cloud-init runcmd uses `HOMESTAK_APPLY=config` instead of explicit `./run.sh config` calls; config-complete marker path changed to `~/etc/state/config-complete.json` (bootstrap#75)
 
+### Removed
+- Remove unused `var.ssh_user` from generic environment — was declared but never referenced (iac-driver#275)
+
 ## v0.51 - 2026-02-28
 
 No changes.
