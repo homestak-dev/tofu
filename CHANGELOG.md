@@ -14,7 +14,7 @@
 
 ### Breaking
 
-- **Sudo-less migration**: Cloud-init runcmd uses `HOMESTAK_APPLY=config` instead of explicit `./run.sh config` calls; config-complete marker path changed to `~/etc/state/config-complete.json` (bootstrap#75)
+- **User-owned path model**: Cloud-init runcmd uses `HOMESTAK_APPLY=config` instead of explicit `./run.sh config` calls; config-complete marker path changed to `~/etc/state/config-complete.json` (bootstrap#75)
 
 ## v0.51 - 2026-02-28
 
